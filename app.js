@@ -5,7 +5,7 @@ const app = express();
 const port = 8000;
 const hostname = "localhost";
 
-// const routes = require('./routes/');
+const router = require('./routes/test.js');
 
 var hbs = exphbs.create({
     extname: ".hbs",
@@ -17,6 +17,7 @@ app.set('view engine', 'hbs');
 app.engine('hbs', hbs.engine);
 
 app.use(express.static('public'));
+app.use(router);
 
 app.get('/', (req, res) => (
     res.render('main', {layout: 'index'})
