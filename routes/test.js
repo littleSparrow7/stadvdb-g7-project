@@ -7,7 +7,7 @@ router.get('/test', function(req, res){
 });
 
 router.get('/check1', function(req,res){
-    node1.query("select * from movies", function(error, result){
+    node1.query("select * from movies limit 10", function(error, result){
         if(error){
             res.send(error);
         }
@@ -18,7 +18,7 @@ router.get('/check1', function(req,res){
 });
 
 router.get('/check2', function(req,res){
-    node2.query("select * from movies", function(error, result){
+    node2.query("select * from movies limit 10", function(error, result){
         if(error){
             res.send(error);
         }
@@ -29,7 +29,7 @@ router.get('/check2', function(req,res){
 });
 
 router.get('/check3', function(req,res){
-    node3.query("select * from movies", function(error, result){
+    node3.query("select * from movies limit 10", function(error, result){
         if(error){
             res.send(error);
         }
