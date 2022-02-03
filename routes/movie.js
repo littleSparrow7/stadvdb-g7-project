@@ -1,12 +1,15 @@
 class Movie {
-    constructor(id, title, year, rating, genre, first_name, last_name){
+    constructor(id, title, year, rating, nsynced){
         this.id = id;
         this.title = title;
         this.year = year;
         this.rating = rating;
-        this.genre = genre;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.nsynced = nsynced;
+    }
+    
+    get valuesString(){
+        var values = "VALUES (" + this.id + ", '" + this.title + "', " + this.year + " , " + this.rating + ", " + this.nsynced + ")";
+        return values;
     }
 }
 
