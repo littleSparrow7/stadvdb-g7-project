@@ -23,4 +23,20 @@ app.get('/', (req, res) => (
     res.render('main', {layout: 'index'})
 ));
 
+app.get('/addRecord', (req, res) => (
+    res.render('addRecord', {layout: 'index', label: 'Add'})
+));
+
+app.get('/deleteRecord', (req, res) => (
+    res.render('deleteRecord', {layout: 'index', label: 'Delete'})
+));
+
+app.get('/updateRecord', (req, res) => (
+    res.render('updateRecord', {layout: 'index', label: 'Update'})
+));
+
+app.get('/searchRecord', (req, res) => (
+    res.render('searchRecord', {layout: 'index', label: 'Search'})
+));
+
 app.listen(port, hostname, () => console.log(`Server running at: http://${hostname}:${port}`));
