@@ -22,5 +22,6 @@
   "bugs": {
     "url": "https://github.com/littleSparrow7/stadvdb-g7-project/issues"
   },
-  "homepage": "https://github.com/littleSparrow7/stadvdb-g7-project#readme"
+  "homepage": "https://github.com/littleSparrow7/stadvdb-g7-project#readme",
+  "devDependencies": {}
 }
