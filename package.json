@@ -14,5 +14,13 @@
     "express-handlebars": "^6.0.2",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/littleSparrow7/stadvdb-g7-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/littleSparrow7/stadvdb-g7-project/issues"
+  },
+  "homepage": "https://github.com/littleSparrow7/stadvdb-g7-project#readme"
 }
