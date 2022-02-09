@@ -2,6 +2,7 @@
 :root{
   --color-primary-body: #11111dff;
   --color-secondary-body: #212236ff;
+  --color-tertiary-body: #3f3c61;
   --color-navbar: #171624ff;
   --color-font: #eeeff7ff;
   --color-secondary-font: #d5d6e8ff;
@@ -68,7 +69,7 @@ body {
 }
 
 .nav-link:hover{
-  background-color: #3f3c61;
+  background-color: var(--color-tertiary-body);
   color: var(--color-font);
 }
 

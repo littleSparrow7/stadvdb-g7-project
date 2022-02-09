@@ -10,6 +10,7 @@
   /* base colors */
   --color-primary-body: #11111dff;
   --color-secondary-body: #212236ff;
+  --color-tertiary-body: #3f3c61;
   --color-navbar: #171624ff;
   --color-font: #eeeff7ff;
   --color-secondary-font: #d5d6e8ff;
@@ -1989,7 +1990,7 @@ progress {
   vertical-align: bottom;
   position: sticky;
   top: -1px;
-  background-color: var(--color-secondary-body);
+  background-color: var(--color-tertiary-body);
   color: var(--color-font); 
 }
 .table > :not(:first-child) {
@@ -2133,6 +2134,7 @@ progress {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   height: 30%;
+  width: 95%;
 }
 
 @media (max-width: 575.98px) {

@@ -39,4 +39,8 @@ app.get('/searchRecord', (req, res) => (
     res.render('searchRecord', {layout: 'index', label: 'Search'})
 ));
 
+app.get('/searchResults', (req, res) => (
+    res.render('searchResults', {layout: 'index'})
+));
+
 app.listen(port, hostname, () => console.log(`Server running at: http://${hostname}:${port}`));
