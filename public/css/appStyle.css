@@ -142,3 +142,21 @@ body {
   width: 50%;
 }
 
+/*
+  Table
+*/
+.numbers{
+  padding-right: 1.25rem;
+  width: 15%;
+  text-align: right;
+}
+
+.words{
+  padding-left: 2rem;
+  text-align: left;
+}
+
+.numbers,
+.words {
+    padding-top: 0.25rem;
+}
