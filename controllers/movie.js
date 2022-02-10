@@ -13,4 +13,4 @@ class Movie {
     }
 }
 
-module.exports = Movie;
+export { Movie as default };

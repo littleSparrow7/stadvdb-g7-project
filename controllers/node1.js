@@ -1,8 +1,8 @@
-const {node1, node2, node3} = require('./pools.js');
-const nodes = require("./nodes.js");
+import { node1, node2, node3 } from './pools.js';
+import { insertMovie } from "./nodes.js";
 
-exports.addMovie = function(req, res){
-    // nodes.utils().insertMovie(node1, movie);
+export function addMovie(req, res){
+    // insertMovie(node1, movie);
     
     //if year > 1980, insert to...
     //else, insert to...
@@ -11,7 +11,7 @@ exports.addMovie = function(req, res){
     res.send("ADD MOVIE");
 }
 
-exports.updateMovie = function(req, res){
+export function updateMovie(req, res){
     //update
     //if year > 1980, update...
     //else, update...
@@ -20,7 +20,7 @@ exports.updateMovie = function(req, res){
     res.send("UPDATE MOVIE");
 }
 
-exports.deleteMovie = function(req, res){
+export function deleteMovie(req, res){
     //delete
     //if year > 1980, delete...
     //else, delete...

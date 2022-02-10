@@ -1,6 +1,6 @@
-var mysql = require('mysql');
+import mysql from 'mysql';
 
-var node1 = mysql.createPool({
+export var node1 = mysql.createPool({
     host: 'db4free.net',
     port: 3306,
     user: 'admin_g7_db1',
@@ -10,7 +10,7 @@ var node1 = mysql.createPool({
     multipleStatements: true
 });
 
-var node2 = mysql.createPool({
+export var node2 = mysql.createPool({
     host: 'db4free.net',
     port: 3306,
     user: 'admin_g7_db2',
@@ -20,7 +20,7 @@ var node2 = mysql.createPool({
     multipleStatements: true
 });
 
-var node3 = mysql.createPool({
+export var node3 = mysql.createPool({
     host: 'db4free.net',
     port: 3306,
     user: 'admin_g7_db3',
@@ -29,5 +29,3 @@ var node3 = mysql.createPool({
     connectionLimit: 100,
     multipleStatements: true
 });
-
-module.exports = { node1, node2, node3 };

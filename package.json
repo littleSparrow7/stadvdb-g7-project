@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "stadvdb final project",
   "main": "index.js",
+  "type": "module",
   "scripts": {
+    "start": "node app.js",
     "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +24,5 @@
   "bugs": {
     "url": "https://github.com/littleSparrow7/stadvdb-g7-project/issues"
   },
-  "homepage": "https://github.com/littleSparrow7/stadvdb-g7-project#readme",
-  "devDependencies": {}
+  "homepage": "https://github.com/littleSparrow7/stadvdb-g7-project#readme"
 }

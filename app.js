@@ -1,11 +1,16 @@
-const express = require('express');
-const exphbs = require('express-handlebars');
+import express from 'express';
+import exphbs from 'express-handlebars';
+import { router } from './routes/routes.js';
+import path from 'path';
+import {fileURLToPath} from 'url';
 
 const app = express();
 const port = 8000;
 const hostname = "localhost";
 
-const router = require('./routes/test.js');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 var hbs = exphbs.create({
     extname: ".hbs",
@@ -16,8 +21,9 @@ var hbs = exphbs.create({
 app.set('view engine', 'hbs');
 app.engine('hbs', hbs.engine);
 
-app.use(express.static('public'));
-app.use(router);
+app.use(express.static('public'))
+app.use('/js', express.static('public/js'));
+app.use('/', router);
 
 app.get('/', (req, res) => (
     res.render('main', {layout: 'index'})

@@ -1,9 +1,9 @@
-const user = require("./user.js");
+import { insertMovie } from "./user.js";
 
 $(document).ready(function(){
     $('#btn-add-record').click(function(){
-        user.insertMovie(null);
-        $("#inputTitle4").text("");
-        alert("INSERT MOVIE");
+        insertMovie(null);
+        window.open("https://stackoverflow.com/questions/15153781/open-new-tabwindow-by-clicking-a-link-in-jquery", '_blank');
+        alert("YAY")
     });
 });
