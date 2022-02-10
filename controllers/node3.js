@@ -6,17 +6,13 @@ export function addMovie(req, res){
     
     //if year < 1980, insert to node 2
     //else, insert to node 3
-    //check nsynced from other nodes
-    //check nsynced from current node
     res.send("ADD MOVIE");
 }
 
 export function updateMovie(req, res){
     //update
     //if year < 1980, update node 2
-    //else, update node 3
-    //check nsynced from other nodes
-    //check nsynced from current node
+    //else, update...
     res.send("UPDATE MOVIE");
 }
 
@@ -24,8 +20,7 @@ export function deleteMovie(req, res){
     //delete
     //if year < 1980, delete from node 2
     //else, delete from node 3
-    //check nsynced from other nodes
-    //check nsynced from current node
+    //check nsynced
     res.send("DELETE MOVIE")
 }
 

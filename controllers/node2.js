@@ -2,9 +2,8 @@ import { node1, node2, node3 } from './pools.js';
 import { insertMovie } from "./nodes.js";
 
 export function addMovie(req, res){
-    // insertMovie(node1, movie);
-    
-    //if year < 1980, insert to node 2
+    //insert to node1
+    //if year < 1980, insert
     //else, insert to node 3
     //check nsynced from other nodes
     //check nsynced from current node
@@ -12,18 +11,18 @@ export function addMovie(req, res){
 }
 
 export function updateMovie(req, res){
-    //update
-    //if year < 1980, update node 2
+    //if year < 1980, update
     //else, update node 3
+    //update node 1
     //check nsynced from other nodes
     //check nsynced from current node
     res.send("UPDATE MOVIE");
 }
 
 export function deleteMovie(req, res){
-    //delete
-    //if year < 1980, delete from node 2
+    //if year < 1980, delete
     //else, delete from node 3
+    //delete from node1
     //check nsynced from other nodes
     //check nsynced from current node
     res.send("DELETE MOVIE")
