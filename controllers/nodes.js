@@ -3,6 +3,11 @@ const stmt_delete = "DELETE FROM movies "
 const stmt_update = "UPDATE movies "
 const stmt_find = "SELECT * from movies "
 
+/**
+ * Inserts movie to the database
+ * @param {mysqlpool} mysqlpool of node to insert to 
+ * @param {Movie} movie to be inserted
+ */
 export function insertMovie(pool, movie){
     stmt_values = movie.valuesString;
 
@@ -17,23 +22,46 @@ export function insertMovie(pool, movie){
     });
 }
 
+/**
+ * Inserts single entry to the database
+ * @param {mysqlpool} mysqlpool of node to insert to
+ * @param {array} array of values to insert into database
+ */
 export function insertIntoPool(pool, arr){
     stmt_values = "VALUES ('" + arr.join("', '") + "')";
     pool.query(stmt_insert + stmt_values);
 }
 
-export function updateIntoPool(pool, cond_arr, update_arr){
-    stmt_set = "SET " + cond_arr.join("', '") + " ";
-    stmt_conditions = "WHERE " + cond_arr.join("', '");
-    pool.query(stmt_update + stmt_set + stmt_conditions);
+/**
+ * Updates single entry in a database
+ * @param {mysqlpool} mysqlpool to be updated
+ * @param {number} id of entry to update
+ * @param {array} array of values to update
+ * note, you can change array to sth else to make it easier.
+ * see notes in user.js
+ */
+export function updateOnePool(pool, id, arr){
+    // stmt_set = "SET " + cond_arr.join("', '") + " ";
+    // stmt_conditions = "WHERE id=" + id
+    // pool.query(stmt_update + stmt_set + stmt_conditions);
 }
 
-export function deleteFromPool(pool, arr){
-    stmt_conditions = "WHERE " + arr.join("', '");
-    pool.query(stmt_delete + stmt_conditions);
+/**
+ * Marks single entry in a database as deleted
+ * @param {mysqlpool} mysqlpool that contains entry
+ * @param {id} id of entry to be deleted
+ */
+export function deleteOnePool(pool, id){
+    // stmt_conditions = "WHERE " + arr.join("', '");
+    // pool.query(stmt_delete + stmt_conditions);
 }
 
-export function findFromPool(pool ,arr){
+/**
+ * Searches for entries matching specific conditions in the database
+ * @param {mysqlpool} mysqlpool to be searched
+ * @param {obj} object containing values to search 
+ */
+export function searchPool(pool, obj){
     stmt_conditions = "WHERE " + arr.join("', '");
     pool.query(stmt_find + stmt_conditions);
 }
