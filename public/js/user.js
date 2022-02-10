@@ -1,6 +1,3 @@
-import express from 'express';
-const router = express.Router();
-
 var NODE = 1;
 var nodepath = '/node' + NODE;
 var ISOLATION_LEVEL = 'SERIALIZABLE';
@@ -12,9 +9,10 @@ var ISOLATION_LEVEL = 'SERIALIZABLE';
  */
 export function insertMovie(movie){
     console.log("INSERT MOVIE");
-    router.route(nodepath + "/insertMovie").post(function(req, res, next){
+    $.post(nodepath + "/insertMovie", function(req, res, next){
         res.send(res);
-    });
+    })
+    router.route(nodepath + "/insertMovie").post();
 }
 
 //TODO: update movie
