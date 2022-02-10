@@ -52,8 +52,8 @@ export function updateOnePool(pool, id, arr){
  * @param {id} id of entry to be deleted
  */
 export function deleteOnePool(pool, id){
-    // stmt_conditions = "WHERE " + arr.join("', '");
-    // pool.query(stmt_delete + stmt_conditions);
+    //stmt_conditions = "WHERE movie.id = " + id;
+    //pool.query(stmt_delete + stmt_conditions);
 }
 
 /**

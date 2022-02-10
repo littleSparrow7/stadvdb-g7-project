@@ -13,4 +13,4 @@ router.post('/node1/:id/updateMovie', node1Controller.updateMovie);
 router.post('/node1/:id/deleteMovie', node1Controller.deleteMovie);
 
 // GET request for searching a movie from node1
-router.get('/node1/searchMovie', node1Router.searchMovie);
+//router.get('/node1/searchMovie', node1Router.searchMovie);
