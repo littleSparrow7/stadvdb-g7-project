@@ -1,14 +1,23 @@
+import { nodepath } from './user.js';
+
 $(document).ready(function(){
-    var movie = null;
     $('#btn-add-record').click(function(){
+        var movie = {
+            title: $("#inputTitle4").val(),
+            year: $("#inputYear").val(),
+            rank: $("#inputRank").val()
+        };
+
+        //TODO: check if movie is valid
         //TODO: insert movie
         /**
          * Inserts new movie to the database
-         * @param { Movie } movie movie without id
+         * @param { Movie } movie without id
          */
-        $.post("/node1/addMovie", movie, function(data){
+        $.post(nodepath + "/addMovie", movie, function(data){
             console.log(data);
             //add to database
         });
+        alert("YAY");
     });
 });
