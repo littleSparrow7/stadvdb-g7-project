@@ -1,5 +1,5 @@
 import { node1, node2, node3 } from './pools.js';
-import { insertMovie } from "./nodes.js";
+import * as sql from "./nodes.js";
 
 export function addMovie(req, res){
     // insertMovie(node1, movie);
