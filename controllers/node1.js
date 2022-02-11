@@ -1,14 +1,37 @@
 import { node1, node2, node3 } from './pools.js';
-import { insertMovie } from "./nodes.js";
+import * as sql from "./nodes.js";
+import Movie from './movie.js';
 
 export function addMovie(req, res){
-    // insertMovie(node1, movie);
+    sql.lockTableWrite(node1, function(){
+        var backupNode = null;
+
+        if (req.year < 1980)
+            backupNode = node2;
+        else
+            backupNode = node3;
+        
+        sql.lockTableWrite(backupNode, function(){
+            var movie = new Movie(null, req.title, req.year, req.rating, req.nsynced, req.deleted);
+            sql.insertMovie(node1, movie, function(id){
+                movie.id = id;
+                sql.insertMovie(backupNode, movie, function(id){
+                    sql.unlockTables(backupNode, function(){
+                        sql.unlockTables(node1, function(){
+                            res.sendStatus(200);
+                        });
+                    });
+                });
+            });
+        });
+    });
+    
     
     //if year < 1980, insert to node 2
     //else, insert to node 3
     //check nsynced from other nodes
     //check nsynced from current node
-    res.send("ADD MOVIE");
+    // res.send("ADD MOVIE");
 }
 
 export function updateMovie(req, res){

@@ -8,16 +8,17 @@ const stmt_find = "SELECT * from movies "
  * @param {mysqlpool} mysqlpool of node to insert to 
  * @param {Movie} movie to be inserted
  */
-export function insertMovie(pool, movie){
-    stmt_values = movie.valuesString;
+export function insertMovie(pool, movie, callback){
+    movie.nsynced = 1;
+    var stmt = movie.queryString;
 
-    pool.query(stmt_insert + stmt_values, function(err, res){
+    pool.query("INSERT INTO " + stmt, function(err, res){
         if(err){
             console.log(err);
         }
         else{
             console.log(res);
-            // res.insertId
+            callback(res.insertId);
         }
     });
 }
@@ -28,8 +29,8 @@ export function insertMovie(pool, movie){
  * @param {array} array of values to insert into database
  */
 export function insertIntoPool(pool, arr){
-    stmt_values = "VALUES ('" + arr.join("', '") + "')";
-    pool.query(stmt_insert + stmt_values);
+    // stmt_values = "VALUES ('" + arr.join("', '") + "')";
+    // pool.query(stmt_insert + stmt_values);
 }
 
 /**
@@ -64,4 +65,50 @@ export function deleteOnePool(pool, id){
 export function searchPool(pool, obj){
     stmt_conditions = "WHERE " + arr.join("', '");
     pool.query(stmt_find + stmt_conditions);
+}
+
+/**
+ * Locks the table for writing. Other connections cannot read or write.
+ * @param {mysqlpool} pool 
+ * @param {function} callback 
+ */
+export function lockTableWrite(pool, callback){
+    pool.query("LOCK TABLE movies WRITE", function(err, res){
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log(res);
+            callback();
+        }
+    });
+}
+
+/**
+ * Locks the table for reading. Other connections cannot write.
+ * @param {mysqlpool} pool 
+ * @param {function} callback 
+ */
+export function lockTableRead(pool, callback){
+    pool.query("LOCK TABLE movies READ", function(err, res){
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log(res);
+            callback();
+        }
+    });
+}
+
+export function unlockTables(pool, callback){
+    pool.query("UNLOCK TABLES", function(err, res){
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log(res);
+            callback();
+        }
+    });
 }
