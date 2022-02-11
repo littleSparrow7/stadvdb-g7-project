@@ -2,9 +2,11 @@ const stmt_insert = "INSERT INTO movies (`id`, `name`, `year`, `rank`, `nsynced`
 const stmt_delete = "DELETE FROM movies "
 const stmt_update = "UPDATE movies "
 const stmt_find = "SELECT * from movies "
+const retry_time = 100;
+const retry_count = 5;
 
 /**
- * Inserts movie to the database
+ * Inserts movie to the database. Returns id and status code in callback
  * @param {mysqlpool} mysqlpool of node to insert to 
  * @param {Movie} movie to be inserted
  */
@@ -15,10 +17,11 @@ export function insertMovie(pool, movie, callback){
     pool.query("INSERT INTO " + stmt, function(err, res){
         if(err){
             console.log(err);
+            callback(null, 500);
         }
         else{
             console.log(res);
-            callback(res.insertId);
+            callback(res.insertId, 200);
         }
     });
 }
@@ -69,19 +72,58 @@ export function searchPool(pool, obj){
 
 /**
  * Locks the table for writing. Other connections cannot read or write.
+ * Tries 5 times before quitting
  * @param {mysqlpool} pool 
  * @param {function} callback 
  */
 export function lockTableWrite(pool, callback){
-    pool.query("LOCK TABLE movies WRITE", function(err, res){
-        if(err){
-            console.log(err);
+    lockTableWriteSingle(pool, callback, 0);
+}
+
+/**
+ * Locks two tables for writing. Locks pool1 first then pool2.
+ * Returns status in callback
+ * 
+ * @param {mysqlpool} pool1 
+ * @param {mysqlpool} pool2 
+ * @param {function} callback 
+ */
+export function lockTablesWrite(pool1, pool2, callback){
+    lockTableWriteSingle(pool1, function(status){
+        if (status == 200){
+            lockTableWriteSingle(pool2, callback, 0);
         }
         else{
-            console.log(res);
-            callback();
+            callback(status);
         }
-    });
+    }, 0);
+}
+
+/**
+ * Recursive function for retrying locking multiple times.
+ * @param {mysqlpool} pool 
+ * @param {function} callback 
+ * @param {retries} number of retries 
+ */
+export function lockTableWriteSingle(pool, callback, retries){
+    if (retries < retry_count){
+        pool.query("LOCK TABLE movies WRITE", function(err, res){
+            if(err){
+                console.log(err);
+                // wait 100ms, try again x4
+                setTimeout(function(){
+                    lockTableWriteSingle(pool, callback, retries + 1)
+                }, retry_time);
+            }
+            else{
+                console.log(res);
+                callback(200);
+            }
+        });
+    }
+    else{
+        callback(503);
+    }
 }
 
 /**
@@ -101,14 +143,36 @@ export function lockTableRead(pool, callback){
     });
 }
 
-export function unlockTables(pool, callback){
+/**
+ * Unlock tables from single database. Sends status code in callback.
+ * @param {mysqlpool} pool 
+ * @param {function} callback 
+ */
+export function unlockTable(pool, callback){
     pool.query("UNLOCK TABLES", function(err, res){
         if(err){
             console.log(err);
+            callback(500);
         }
         else{
             console.log(res);
-            callback();
+            callback(200);
+        }
+    });
+}
+
+/**
+ * Unlock tables from two databases. Sends status code in callback.
+ * @param {mysqlpool} pool 
+ * @param {function} callback 
+ */
+export function unlockTables(pool1, pool2, callback){
+    unlockTable(pool1, function(status){
+        if (status == 200){
+            unlockTable(pool2, callback);
+        }
+        else{
+            callback(status);
         }
     });
 }

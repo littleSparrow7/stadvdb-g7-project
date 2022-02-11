@@ -51,7 +51,7 @@ test.get('/add1', function (req,res){
 
 test.get('/add1Node', function (req,res){
     var movie = {
-        title: "Title",
+        title: "Title1974",
         year: 1973,
         rank: null,
         nsynced: 0,
@@ -61,4 +61,28 @@ test.get('/add1Node', function (req,res){
     // sql.insertMovie(node1, movie, function(result){
     //     res.send(result);
     // });
+});
+
+
+test.get('/locks1', function(req, res){
+    console.log("LOCKING");
+    sql.lockTablesWrite(node1, node2, function(status){
+        sql.unlockTables(node1, node2, function(status2){
+            res.send({lock: status, unlock: status2});
+        });
+    })
+});
+
+test.get('/lock1', function(req, res){
+    console.log("LOCKING");
+    node1.query("LOCK TABLE movies WRITE", function(err, result){
+        if(err){
+            res.send(err);
+            console.log(err);
+        }
+        else{
+            res.send(result);
+            console.log(result);
+        }
+    });
 });
