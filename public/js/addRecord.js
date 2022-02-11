@@ -5,7 +5,9 @@ $(document).ready(function(){
         var movie = {
             title: $("#inputTitle4").val(),
             year: $("#inputYear").val(),
-            rank: $("#inputRank").val()
+            rank: $("#inputRank").val(),
+            nsynced: 0,
+            deleted: 0
         };
 
         //TODO: check if movie is valid
