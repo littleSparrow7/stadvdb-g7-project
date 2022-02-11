@@ -1,6 +1,7 @@
 import express from 'express';
 import exphbs from 'express-handlebars';
 import { router } from './routes/routes.js';
+import { test } from './tests/test.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
@@ -24,6 +25,7 @@ app.engine('hbs', hbs.engine);
 app.use(express.static('public'))
 app.use('/js', express.static('public/js'));
 app.use('/', router);
+app.use('/test', test);
 
 app.get('/', (req, res) => (
     res.render('main', {layout: 'index'})
