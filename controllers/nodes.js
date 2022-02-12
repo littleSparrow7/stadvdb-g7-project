@@ -6,9 +6,10 @@ const retry_time = 100;
 const retry_count = 5;
 
 /**
- * Inserts movie to the database. Returns id and status code in callback
+ * Inserts movie to the database. Calls callback after executing query.
  * @param {mysqlpool} mysqlpool of node to insert to 
  * @param {Movie} movie to be inserted
+ * @param {function} callback contains id and status code
  */
 export function insertMovie(pool, movie, callback){
     movie.nsynced = 1;
@@ -82,7 +83,7 @@ export function lockTableWrite(pool, callback){
 
 /**
  * Locks two tables for writing. Locks pool1 first then pool2.
- * Returns status in callback
+ * Returns statuses in callback
  * 
  * @param {mysqlpool} pool1 
  * @param {mysqlpool} pool2 
@@ -91,10 +92,12 @@ export function lockTableWrite(pool, callback){
 export function lockTablesWrite(pool1, pool2, callback){
     lockTableWriteSingle(pool1, function(status){
         if (status == 200){
-            lockTableWriteSingle(pool2, callback, 0);
+            lockTableWriteSingle(pool2, function(status2){
+                callback({pool1: status, pool2: status});
+            }, 0);
         }
         else{
-            callback(status);
+            callback({pool1: status, pool2: null});
         }
     }, 0);
 }
@@ -107,7 +110,7 @@ export function lockTablesWrite(pool1, pool2, callback){
  */
 export function lockTableWriteSingle(pool, callback, retries){
     if (retries < retry_count){
-        pool.query("LOCK TABLE movies WRITE", function(err, res){
+        pool.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
             if(err){
                 console.log(err);
                 // wait 100ms, try again x4
@@ -144,15 +147,53 @@ export function lockTableRead(pool, callback){
 }
 
 /**
+ * Commits transactions for a pool
+ * If failed, rolls back transaction
+ * Sends 405 (Method Not Allowed) if failed
+ * @param {mysqlpool} pool 
+ * @param {function} callback 
+ */
+export function commitOrRollBackTransaction(pool, callback){
+    pool.query("COMMIT", function(err, res){
+        if (err){
+            rollbackTransaction(pool, function(rollbackStatus){
+                callback({commit: 405, rollback: rollbackStatus});
+            })
+        }
+        else{
+            callback({commit: 200, rollback: null});
+        }
+    });
+}
+
+/**
+ * Rolls back transactions for a pool
+ * Sends 502 (Bad Gateway) if failed
+ * @param {mysqlpool} pool 
+ * @param {function} callback 
+ */
+export function rollbackTransaction(pool, callback){
+    pool.query("ROLLBACK", function(err, res){
+        if (err){
+            callback(502);
+        }
+        else{
+            callback(200);
+        }
+    });
+}
+
+/**
  * Unlock tables from single database. Sends status code in callback.
+ * Sends 423 (LOCKED) to callback if failed
  * @param {mysqlpool} pool 
  * @param {function} callback 
  */
 export function unlockTable(pool, callback){
-    pool.query("UNLOCK TABLES", function(err, res){
+    pool.query("UNLOCK TABLES;", function(err, res){
         if(err){
             console.log(err);
-            callback(500);
+            callback(423);
         }
         else{
             console.log(res);
@@ -162,17 +203,14 @@ export function unlockTable(pool, callback){
 }
 
 /**
- * Unlock tables from two databases. Sends status code in callback.
+ * Unlock tables from two databases. Sends status codes in callback.
  * @param {mysqlpool} pool 
  * @param {function} callback 
  */
 export function unlockTables(pool1, pool2, callback){
-    unlockTable(pool1, function(status){
-        if (status == 200){
-            unlockTable(pool2, callback);
-        }
-        else{
-            callback(status);
-        }
+    unlockTable(pool1, function(status1){
+        unlockTable(pool2, function(status2){
+            callback({pool1: status1, pool2: status2});
+        });
     });
 }

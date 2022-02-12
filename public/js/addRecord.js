@@ -6,7 +6,7 @@ $(document).ready(function(){
             title: $("#inputTitle4").val(),
             year: $("#inputYear").val(),
             rank: $("#inputRank").val(),
-            nsynced: 0,
+            nsynced: 1,
             deleted: 0
         };
 

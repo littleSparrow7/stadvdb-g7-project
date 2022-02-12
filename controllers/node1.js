@@ -1,6 +1,7 @@
 import { node1, node2, node3 } from './pools.js';
 import * as sql from "./nodes.js";
 import Movie from './movie.js';
+import { uncommittedMovies } from '/js/user.js';
 
 export function addMovie(req, res){
     //set other node to write to
@@ -10,59 +11,85 @@ export function addMovie(req, res){
 
     //lock necessary tables
     sql.lockTablesWrite(node1, backupNode, function(lockStatus){
-        if (lockStatus == 200){
-            //insert to first node
+        if (lockStatus.pool1 == 200){
+            //if successfully locked node1, insert
             sql.insertMovie(node1, movie, function(id, insert1Status){
                 if (insert1Status == 200){
-                    movie.id = id; //get id as last inserted
+                    if (lockStatus.pool2 == 200){
+                        //if lock 2 also successful, add to 2
+                        movie.id = id;
 
-                    //insert to other node
-                    sql.insertMovie(backupNode, movie, function(id2, insert2Status){
-                        if (insert2Status == 200){
-                            sql.unlockTables(backupNode, node1, function(unlockStatus){
-                                res.sendStatus(unlockStatus);
+                        //insert movie to node2
+                        sql.insertMovie(node2, movie, function(id, insert2Status){
+                            //regardless of whether node2 was successful, node1 must be successful in committing
+                            sql.commitOrRollBackTransaction(node1, function(commit1Status){
+                                if (commit1Status.commit == 200){
+                                    //if node1 successfully committed, commit node2
+                                    sql.commitOrRollBackTransaction(node2, function(commit2Status){
+                                        sql.unlockTables(node1, node2, function(unlockStatus){
+                                            res.send(unlockStatus);
+                                        });
+                                    });
+                                }
+                                else {
+                                    //if node1 is unsuccessful
+                                    uncommittedMovies.push(movie);
+
+                                    // node 2 was locked, always rollback because node1 failed
+                                    sql.rollbackTransaction(node2, function(rollback2Status){
+                                        sql.unlockTables(node1, node2, function(unlockStatus){
+                                            res.send(unlockStatus);
+                                        });
+                                    });
+                                }
+                            });
+                        });
+                    }
+                    else{
+                        //if lock 2 not succesful, end transaction
+                        //if end transaction successful, unlock
+                        //if end transaction unsuccessful, add to local list, rollback then unlock
+                        sql.commitOrRollBackTransaction(node1, function(commit1Status){
+                            if (commit1Status.commit != 200){
+                                uncommittedMovies.push(movie);
+                            }
+
+                            sql.unlockTable(node1, function(unlock1Status){
+                                res.send({commit: commit1Status.commit, unlock: unlock1Status});
+                            });
+                        });
+                    }
+                }
+                else{
+                    // if failed to add, add to list, 
+                    uncommittedMovies.push(movie);
+
+                    //rollback transaction 1
+                    sql.rollbackTransaction(node1, function(rollback1Status){
+                        if (lockStatus.pool2 == 200){
+                            //unlock 2 also if it was locked earlier
+                            sql.unlockTables(node1, backupNode, function(unlockStatus){
+                                res.send(unlockStatus);
                             });
                         }
                         else{
-                            //change nsynced of first node
-                            movie.nsynced = 1;
-                            //TODO: update nsynced of movie in first table
-                            //TODO: unlock tables
-                            res.sendStatus(insert2Status);
+                            //only unlock 1
+                            sql.unlockTable(node1, function(unlockStatus){
+                                res.send(unlockStatus);
+                            })
                         }
-                    });
-                }
-                else{
-                    //since, have locks to both tables, no deadlocks
-                    //if it fails, don't try to add. can't do anything since master node is gone and no local db.
-                    sql.unlockTables(backupNode, node1, function(unlockStatus){
-                        res.sendStatus(insert1Status);
                     });
                 }
             });
         }
         else{
-            //if failed, add to node1 and update in others later
-            movie.nsynced = 1;
-            sql.insertMovie(node1, movie, function(id, insertStatus){
-                if (insertStatus == 200){
-                    sql.unlockTable(node1, function(unlockStatus){
-                        res.sendStatus(unlockStatus);
-                    });
-                }
-                else {
-                    //send status of why insert failed
-                    sql.unlockTable(node1, function(unlockStatus){
-                        res.sendStatus(insert1Status);
-                    });
-                }
-            });
+            //if failed to lock node1, add to local list.
+            //let syncing function handle it later.
+            uncommittedMovies.push(movie);
+            res.sendStatus(lockStatus);
         }
     });
     
-    
-    //if year < 1980, insert to node 2
-    //else, insert to node 3
     //check nsynced from other nodes
     //check nsynced from current node
     // res.send("ADD MOVIE");
