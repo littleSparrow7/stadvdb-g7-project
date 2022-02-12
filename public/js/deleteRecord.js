@@ -1,7 +1,10 @@
 import { nodepath } from './user.js';
 
 $(document).ready(function(){    
-    
+   // hides info and error msg
+   $("#info").hide();
+   $("#error").hide();
+   
     // $('#btn-delete-record').click(function(){
     //     var id = $("#inputID4").val();
 
