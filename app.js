@@ -24,6 +24,8 @@ app.engine('hbs', hbs.engine);
 
 app.use(express.static('public'))
 app.use('/js', express.static('public/js'));
+app.use(express.urlencoded({extended : true}));
+app.use(express.json());
 app.use('/', router);
 app.use('/test', test);
 

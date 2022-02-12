@@ -1,13 +1,14 @@
 import { node1, node2, node3 } from './pools.js';
 import * as sql from "./nodes.js";
-import Movie from './movie.js';
-import { uncommittedMovies } from '/js/user.js';
+import Movie from '../public/js/movie.js';
+import { uncommittedMovies } from '../public/js/user.js';
 
 export function addMovie(req, res){
     //set other node to write to
-    var backupNode = (req.year < 1980)? node2 : node3;
+    var backupNode = (req.body.year < 1980)? node2 : node3;
     //movie to be inserted
-    var movie = new Movie(null, req.title, req.year, req.rating, req.nsynced, req.deleted);
+    var movie = new Movie(null, req.body.title, req.body.year, req.body.rating, req.body.nsynced, req.body.deleted);
+    console.log(movie);
 
     //lock necessary tables
     sql.lockTablesWrite(node1, backupNode, function(lockStatus){
@@ -20,13 +21,13 @@ export function addMovie(req, res){
                         movie.id = id;
 
                         //insert movie to node2
-                        sql.insertMovie(node2, movie, function(id, insert2Status){
+                        sql.insertMovie(backupNode, movie, function(id, insert2Status){
                             //regardless of whether node2 was successful, node1 must be successful in committing
                             sql.commitOrRollBackTransaction(node1, function(commit1Status){
                                 if (commit1Status.commit == 200){
                                     //if node1 successfully committed, commit node2
-                                    sql.commitOrRollBackTransaction(node2, function(commit2Status){
-                                        sql.unlockTables(node1, node2, function(unlockStatus){
+                                    sql.commitOrRollBackTransaction(backupNode, function(commit2Status){
+                                        sql.unlockTables(node1, backupNode, function(unlockStatus){
                                             res.send(unlockStatus);
                                         });
                                     });
@@ -36,8 +37,8 @@ export function addMovie(req, res){
                                     uncommittedMovies.push(movie);
 
                                     // node 2 was locked, always rollback because node1 failed
-                                    sql.rollbackTransaction(node2, function(rollback2Status){
-                                        sql.unlockTables(node1, node2, function(unlockStatus){
+                                    sql.rollbackTransaction(backupNode, function(rollback2Status){
+                                        sql.unlockTables(node1, backupNode, function(unlockStatus){
                                             res.send(unlockStatus);
                                         });
                                     });
@@ -74,7 +75,7 @@ export function addMovie(req, res){
                         }
                         else{
                             //only unlock 1
-                            sql.unlockTable(node1, function(unlockStatus){
+                            sql.unlockTables(node1, function(unlockStatus){
                                 res.send(unlockStatus);
                             })
                         }

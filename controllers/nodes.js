@@ -12,10 +12,10 @@ const retry_count = 5;
  * @param {function} callback contains id and status code
  */
 export function insertMovie(pool, movie, callback){
-    movie.nsynced = 1;
     var stmt = movie.queryString;
 
     pool.query("INSERT INTO " + stmt, function(err, res){
+        console.log("INSERT TABLE");
         if(err){
             console.log(err);
             callback(null, 500);
@@ -110,13 +110,14 @@ export function lockTablesWrite(pool1, pool2, callback){
  */
 export function lockTableWriteSingle(pool, callback, retries){
     if (retries < retry_count){
-        pool.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
+        pool.query("START TRANSACTION; LOCK TABLE movies WRITE;", function(err, res){
+            console.log("LOCK TABLE WRITE SINGLE " + retries);
             if(err){
                 console.log(err);
-                // wait 100ms, try again x4
-                setTimeout(function(){
-                    lockTableWriteSingle(pool, callback, retries + 1)
-                }, retry_time);
+                // // wait 100ms, try again x4
+                // setTimeout(function(){
+                //     lockTableWriteSingle(pool, callback, retries + 1)
+                // }, retry_time);
             }
             else{
                 console.log(res);
@@ -136,6 +137,7 @@ export function lockTableWriteSingle(pool, callback, retries){
  */
 export function lockTableRead(pool, callback){
     pool.query("LOCK TABLE movies READ", function(err, res){
+        console.log("LOCK TABLE");
         if(err){
             console.log(err);
         }
@@ -155,12 +157,15 @@ export function lockTableRead(pool, callback){
  */
 export function commitOrRollBackTransaction(pool, callback){
     pool.query("COMMIT", function(err, res){
+        console.log("COMMIT");
         if (err){
+            console.log(err);
             rollbackTransaction(pool, function(rollbackStatus){
                 callback({commit: 405, rollback: rollbackStatus});
             })
         }
         else{
+            console.log(res);
             callback({commit: 200, rollback: null});
         }
     });
@@ -174,10 +179,13 @@ export function commitOrRollBackTransaction(pool, callback){
  */
 export function rollbackTransaction(pool, callback){
     pool.query("ROLLBACK", function(err, res){
+        console.log("ROLLBACK");
         if (err){
+            console.log(err);
             callback(502);
         }
         else{
+            console.log(res);
             callback(200);
         }
     });
@@ -191,6 +199,7 @@ export function rollbackTransaction(pool, callback){
  */
 export function unlockTable(pool, callback){
     pool.query("UNLOCK TABLES;", function(err, res){
+        console.log("UNLOCK TABLE");
         if(err){
             console.log(err);
             callback(423);

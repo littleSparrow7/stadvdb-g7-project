@@ -2,11 +2,7 @@ import { node1, node2, node3 } from './pools.js';
 import * as sql from "./nodes.js";
 
 export function addMovie(req, res){
-    //insert to node1
-    //if year < 1980, insert
-    //else, insert to node 3
-    //check nsynced from other nodes
-    //check nsynced from current node
+    //call node1Controller.addMovie
     res.send("ADD MOVIE");
 }
 
