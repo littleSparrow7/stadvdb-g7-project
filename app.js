@@ -28,7 +28,7 @@ app.use('/', router);
 app.use('/test', test);
 
 app.get('/', (req, res) => (
-    res.render('main', {layout: 'index'})
+    res.render('main', {layout: 'index', label:"Home"})
 ));
 
 app.get('/addRecord', (req, res) => (
