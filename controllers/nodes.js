@@ -2,22 +2,22 @@ const stmt_insert = "INSERT INTO movies (`id`, `name`, `year`, `rank`, `nsynced`
 const stmt_delete = "DELETE FROM movies "
 const stmt_update = "UPDATE movies "
 const stmt_find = "SELECT * from movies "
-const retry_time = 100;
+const retry_time = 50;
 const retry_count = 5;
 
 /**
  * Inserts movie to the database. Calls callback after executing query.
- * @param {mysqlpool} mysqlpool of node to insert to 
+ * @param {Connection} conn of node to insert to 
  * @param {Movie} movie to be inserted
  * @param {function} callback contains id and status code
  */
-export function insertMovie(pool, movie, callback){
+export function insertMovie(conn, movie, callback){
     var stmt = movie.queryString;
 
-    pool.query("INSERT INTO " + stmt, function(err, res){
+    conn.query("INSERT INTO " + stmt, function(err, res){
         console.log("INSERT TABLE");
         if(err){
-            console.log(err);
+            console.error(err);
             callback(null, 500);
         }
         else{
@@ -73,47 +73,48 @@ export function searchPool(pool, obj){
 
 /**
  * Locks the table for writing. Other connections cannot read or write.
- * Tries 5 times before quitting
- * @param {mysqlpool} pool 
+ * @param {Connection} conn
  * @param {function} callback 
  */
-export function lockTableWrite(pool, callback){
-    lockTableWriteSingle(pool, callback, 0);
+export function lockTableWrite(conn, callback){
+    lockTableWriteSingle(conn, callback, 0);
 }
 
 /**
- * Locks two tables for writing. Locks pool1 first then pool2.
+ * Locks two tables for writing. Locks conn1 first then conn2.
  * Returns statuses in callback
+ * conn2 is not locked if conn1 fails
  * 
- * @param {mysqlpool} pool1 
- * @param {mysqlpool} pool2 
+ * @param {Connection} conn1 
+ * @param {Connection} conn2 
  * @param {function} callback 
  */
-export function lockTablesWrite(pool1, pool2, callback){
-    lockTableWriteSingle(pool1, function(status){
+export function lockTablesWrite(conn1, conn2, callback){
+    lockTableWriteSingle(conn1, function(status){
         if (status == 200){
-            lockTableWriteSingle(pool2, function(status2){
-                callback({pool1: status, pool2: status});
+            lockTableWriteSingle(conn2, function(status2){
+                callback({conn1: status, conn2: status2});
             }, 0);
         }
         else{
-            callback({pool1: status, pool2: null});
+            callback({conn1: status, conn2: null});
         }
     }, 0);
 }
 
 /**
  * Recursive function for retrying locking multiple times.
- * @param {mysqlpool} pool 
- * @param {function} callback 
- * @param {retries} number of retries 
+ * @param {Connection} conn open connection to database
+ * @param {function} callback returns status code
+ * @param {number} retries number of retries 
  */
-export function lockTableWriteSingle(pool, callback, retries){
+export function lockTableWriteSingle(conn, callback, retries){
     if (retries < retry_count){
-        pool.query("START TRANSACTION; LOCK TABLE movies WRITE;", function(err, res){
+        conn.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
             console.log("LOCK TABLE WRITE SINGLE " + retries);
             if(err){
-                console.log(err);
+                console.error(err);
+                callback(503);
                 // // wait 100ms, try again x4
                 // setTimeout(function(){
                 //     lockTableWriteSingle(pool, callback, retries + 1)
@@ -149,77 +150,83 @@ export function lockTableRead(pool, callback){
 }
 
 /**
- * Commits transactions for a pool
+ * Commits transactions for a connection
  * If failed, rolls back transaction
  * Sends 405 (Method Not Allowed) if failed
- * @param {mysqlpool} pool 
+ * @param {Connection} conn
  * @param {function} callback 
  */
-export function commitOrRollBackTransaction(pool, callback){
-    pool.query("COMMIT", function(err, res){
+export function commitOrRollBackTransaction(conn, callback){
+    conn.commit(function(err){
         console.log("COMMIT");
         if (err){
-            console.log(err);
-            rollbackTransaction(pool, function(rollbackStatus){
+            console.error(err);
+            rollbackTransaction(conn, function(rollbackStatus){
                 callback({commit: 405, rollback: rollbackStatus});
             })
         }
         else{
-            console.log(res);
+            console.log("SUCCESSFULLY COMMITTED");
             callback({commit: 200, rollback: null});
         }
     });
 }
 
 /**
- * Rolls back transactions for a pool
+ * Rolls back transactions for a connection
  * Sends 502 (Bad Gateway) if failed
- * @param {mysqlpool} pool 
+ * @param {Connection} conn 
  * @param {function} callback 
  */
-export function rollbackTransaction(pool, callback){
-    pool.query("ROLLBACK", function(err, res){
+export function rollbackTransaction(conn, callback){
+    conn.rollback(function(err){
         console.log("ROLLBACK");
         if (err){
-            console.log(err);
+            console.error(err);
             callback(502);
         }
         else{
-            console.log(res);
+            console.log("SUCCESSFULLY ROLLED BACK");
             callback(200);
         }
     });
 }
 
 /**
- * Unlock tables from single database. Sends status code in callback.
+ * Unlock tables from single database and releases connection.
+ * Sends status code in callback.
  * Sends 423 (LOCKED) to callback if failed
- * @param {mysqlpool} pool 
+ * @param {Connection} conn 
  * @param {function} callback 
  */
-export function unlockTable(pool, callback){
-    pool.query("UNLOCK TABLES;", function(err, res){
+export function unlockTable(conn, callback){
+    conn.query("UNLOCK TABLES", function(err){
         console.log("UNLOCK TABLE");
+        conn.release();
+
         if(err){
-            console.log(err);
+            console.error(err);
             callback(423);
         }
         else{
-            console.log(res);
+            console.log("SUCCESSFULLY UNLOCKED TABLE");
             callback(200);
         }
     });
 }
 
 /**
- * Unlock tables from two databases. Sends status codes in callback.
- * @param {mysqlpool} pool 
+ * Unlocks tables from two databases and releases connections.
+ * Sends status codes in callback.
+ * 
+ * @param {Connection} conn1
+ * @param {Connection} conn2
  * @param {function} callback 
  */
-export function unlockTables(pool1, pool2, callback){
-    unlockTable(pool1, function(status1){
-        unlockTable(pool2, function(status2){
-            callback({pool1: status1, pool2: status2});
+export function unlockTables(conn1, conn2, callback){
+    unlockTable(conn1, function(status1){
+        unlockTable(conn2, function(status2){
+            callback({conn1: status1, conn2: status2});
         });
     });
 }
