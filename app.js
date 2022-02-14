@@ -4,6 +4,8 @@ import { router } from './routes/routes.js';
 import { test } from './tests/test.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import { CronJob } from 'cron';
+import { syncMovies } from './controllers/node1.js';
 
 const app = express();
 const port = 8000;
@@ -24,6 +26,8 @@ app.engine('hbs', hbs.engine);
 
 app.use(express.static('public'))
 app.use('/js', express.static('public/js'));
+app.use(express.urlencoded({extended : true}));
+app.use(express.json());
 app.use('/', router);
 app.use('/test', test);
 
@@ -52,3 +56,9 @@ app.get('/searchResults', (req, res) => (
 ));
 
 app.listen(port, hostname, () => console.log(`Server running at: http://${hostname}:${port}`));
+
+// sync movies every 30 minutes
+// var job = new CronJob('00 30 * * * *', function(){
+//     verifyRecordIntegrity();
+// })
+// job.start();
