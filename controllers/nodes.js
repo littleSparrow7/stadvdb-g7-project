@@ -1,10 +1,3 @@
-const stmt_insert = "INSERT INTO movies (`id`, `name`, `year`, `rank`, `nsynced`) "
-const stmt_delete = "DELETE FROM movies "
-const stmt_update = "UPDATE movies "
-const stmt_find = "SELECT * from movies "
-const retry_time = 50;
-const retry_count = 5;
-
 /**
  * Inserts movie to the database. Calls callback after executing query.
  * @param {Connection} conn of node to insert to 
@@ -28,47 +21,71 @@ export function insertMovie(conn, movie, callback){
 }
 
 /**
- * Inserts single entry to the database
- * @param {mysqlpool} mysqlpool of node to insert to
- * @param {array} array of values to insert into database
- */
-export function insertIntoPool(pool, arr){
-    // stmt_values = "VALUES ('" + arr.join("', '") + "')";
-    // pool.query(stmt_insert + stmt_values);
-}
-
-/**
  * Updates single entry in a database
- * @param {mysqlpool} mysqlpool to be updated
- * @param {number} id of entry to update
+ * @param {Connection} conn connection to be updated
+ * @param {Movie} movie movie to be updated
  * @param {array} array of values to update
  * note, you can change array to sth else to make it easier.
  * see notes in user.js
  */
-export function updateOnePool(pool, id, arr){
-    // stmt_set = "SET " + cond_arr.join("', '") + " ";
-    // stmt_conditions = "WHERE id=" + id
-    // pool.query(stmt_update + stmt_set + stmt_conditions);
+export function updateMovie(conn, movie, arr){
+    var update_stmt = movie.updateString;
+    conn.query("UPDATE movies SET " + update_stmt + " WHERE id=" + movie.id, function(err, res){
+        console.log("UPDATE movie with id=" + movie.id);
+        if(err){
+            console.error(err);
+            callback(500);
+        }
+        else{
+            console.log(res);
+            callback(200);
+        }
+    });
 }
 
 /**
  * Marks single entry in a database as deleted
- * @param {mysqlpool} mysqlpool that contains entry
+ * @param {Connection} conn that contains entry
  * @param {id} id of entry to be deleted
  */
-export function deleteOnePool(pool, id){
-    // stmt_conditions = "WHERE " + arr.join("', '");
-    // pool.query(stmt_delete + stmt_conditions);
+export function deleteMovie(conn, id){
+    conn.query("UPDATE movies SET deleted=1 WHERE id=" + movie.id, function(err, res){
+        console.log("DELETE movie with id=" + movie.id);
+        if(err){
+            console.error(err);
+            callback(500);
+        }
+        else{
+            console.log(res);
+            callback(200);
+        }
+    });
 }
 
 /**
  * Searches for entries matching specific conditions in the database
- * @param {mysqlpool} mysqlpool to be searched
- * @param {obj} object containing values to search 
+ * @param {Connection} conn connection of database to be searched
+ * @param {Movie} movie object containing values to search 
  */
-export function searchPool(pool, obj){
-    stmt_conditions = "WHERE " + arr.join("', '");
-    pool.query(stmt_find + stmt_conditions);
+export function searchPool(conn, movie){
+    var search_query = "SELECT * FROM movie WHERE ";
+    var search_stmt = movie.filterString;
+
+    //if there are no fields/constraints
+    if (search_stmt == "")
+        search_query = "SELECT * FROM movie";
+
+    conn.query(search_query + search_stmt, function(err, res){
+        console.log("SELECT movie: " + search_stmt);
+        if(err){
+            console.error(err);
+            callback(res);
+        }
+        else{
+            console.log(res);
+            callback(res);
+        }
+    });
 }
 
 /**
@@ -78,7 +95,7 @@ export function searchPool(pool, obj){
  */
 export function lockTableWrite(conn, callback){
     conn.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
-        console.log("LOCK TABLE WRITE SINGLE ");
+        console.log("LOCK TABLE WRITE");
         if(err){
             console.error(err);
             callback(503);
@@ -114,18 +131,19 @@ export function lockTablesWrite(conn1, conn2, callback){
 
 /**
  * Locks the table for reading. Other connections cannot write.
- * @param {mysqlpool} pool 
+ * @param {Connection} conn
  * @param {function} callback 
  */
-export function lockTableRead(pool, callback){
-    pool.query("LOCK TABLE movies READ", function(err, res){
-        console.log("LOCK TABLE");
+ export function lockTableRead(conn, callback){
+    conn.query("SET autocommit = 0; LOCK TABLE movies READ;", function(err, res){
+        console.log("LOCK TABLE READ");
         if(err){
-            console.log(err);
+            console.error(err);
+            callback(503);
         }
         else{
             console.log(res);
-            callback();
+            callback(200);
         }
     });
 }
