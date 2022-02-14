@@ -1,6 +1,6 @@
 import express from 'express';
 export var test = express.Router();
-import {node1, node2, node3} from '../controllers/pools.js';
+import {getConnection, node1, node2, node3} from '../controllers/pools.js';
 import * as sql from '../controllers/nodes.js';
 import * as node1Controller from '../controllers/node1.js';
 import Movie from '../public/js/movie.js';
@@ -73,27 +73,25 @@ test.get('/locks1', function(req, res){
     })
 });
 
-test.get('/unlockAll', function(req, res){
-    console.log("UNLOCKING");
-    sql.unlockTable(node1, function(status){
-        console.log("UNLOCK 1");
-    });
-
-    sql.unlockTable(node2, function(status){
-        console.log("UNLOCK 2");
-    });
-
-    sql.unlockTable(node3, function(status){
-        console.log("UNLOCK 3");
-    });
-});
-
 test.get('/lockStatus', function(req, res){
     console.log("LOCK STATUS");
     var query = "SHOW OPEN TABLES";
     node1.query(query, function(err, result1){
+        if (err){
+            console.log(err);
+        }
+
         node2.query(query, function(err, result2){
+            if (err){
+                console.log(err);
+            }
+
             node3.query(query, function(err, result3){
+                if (err){
+                    console.log(err);
+                }
+                
+                console.log("RESULTS");
                 res.send({result1, result2, result3});
             });
         }); 
@@ -101,7 +99,6 @@ test.get('/lockStatus', function(req, res){
 });
 
 test.get('/tableStatus', function(req, res){
-    var open = "";
     var query = "SHOW FULL PROCESSLIST";
     node1.query(query, function(err, result1){
         node2.query(query, function(err, result2){

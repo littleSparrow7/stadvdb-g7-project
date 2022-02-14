@@ -18,7 +18,7 @@ export function addMovie(req, res){
                     //if successfully locked node1, insert
                     sql.insertMovie(conn1, movie, function(id, insert1Status){
                         if (insert1Status == 200){
-                            if (lockStatus.pool2 == 200){
+                            if (lockStatus.conn2 == 200){
                                 //if lock 2 also successful, add to 2
                                 movie.id = id;
 
@@ -28,11 +28,20 @@ export function addMovie(req, res){
                                     sql.commitOrRollBackTransaction(conn1, function(commit1Status){
                                         if (commit1Status.commit == 200){
                                             //if node1 successfully committed, commit node2
-                                            sql.commitOrRollBackTransaction(conn2, function(commit2Status){
-                                                sql.unlockTables(conn1, conn2, function(unlockStatus){
-                                                    res.send(unlockStatus);
+                                            if (insert2Status == 200){
+                                                sql.commitOrRollBackTransaction(conn2, function(commit2Status){
+                                                    sql.unlockTables(conn1, conn2, function(unlockStatus){
+                                                        res.send(unlockStatus);
+                                                    });
                                                 });
-                                            });
+                                            }
+                                            else{
+                                                sql.rollbackTransaction(conn2, function(rollback2Status){
+                                                    sql.unlockTables(conn1, conn2, function(unlockStatus){
+                                                        res.send(unlockStatus);
+                                                    });
+                                                });
+                                            }
                                         }
                                         else {
                                             //if node1 is unsuccessful
@@ -92,6 +101,9 @@ export function addMovie(req, res){
                     res.sendStatus(lockStatus);
                 }
             });
+        }
+        else{
+            console.error("FAILED TO CONNECT TO THE DATABASES");
         }
     });
     
