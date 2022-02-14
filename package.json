@@ -12,6 +12,7 @@
   "author": "Group 7",
   "license": "ISC",
   "dependencies": {
+    "cron": "^1.8.2",
     "express": "^4.17.2",
     "express-handlebars": "^6.0.2",
     "mysql": "^2.18.1",
