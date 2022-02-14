@@ -41,6 +41,62 @@ class Movie {
         values += ")";
         return cols + values;
     }
+
+    get updateString(){
+        var arr = [];
+
+        if (this.title != null){
+            arr.push("`name`='" + this.title + "'");
+        }
+        
+        if (this.year != null){
+            arr.push("`year`=" + this.year);
+        }
+        
+        if (this.rating != null){
+            arr.push("`rank`=" + this.rating);
+        }
+        
+        if (this.nsynced != null){
+            arr.push("`nsynced`=" + this.nsynced);
+        }
+
+        if (this.deleted != null){
+            arr.push("`deleted`=" + this.deleted);
+        }
+
+        return arr.join(", ");
+    }
+
+    get filterString(){
+        var arr = [];
+
+        if (this.id != null){
+            arr.push("`id`=" + this.id);
+        }
+
+        if (this.title != null){
+            arr.push("`name` LIKE '%" + this.title + "%'");
+        }
+        
+        if (this.year != null){
+            arr.push("`year`=" + this.year);
+        }
+        
+        if (this.rating != null){
+            arr.push("`rank`=" + this.rating);
+        }
+        
+        if (this.nsynced != null){
+            arr.push("`nsynced`=" + this.nsynced);
+        }
+
+        if (this.deleted != null){
+            arr.push("`deleted`=" + this.deleted);
+        }
+
+        return arr.join(" AND ");
+    }
 }
 
 export { Movie as default };
