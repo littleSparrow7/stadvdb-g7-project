@@ -142,61 +142,9 @@ test.get('/killProcessLists', function(req, res){
     });
 })
 
-test.get('/testRollback', function(req, res){
-    var movie = new Movie(null, "A C6 Character Would Be Nice", 2031, null, 1, 0);
-    node1.getConnection(function(err, n1_conn){
-        if (err){
-            console.error(err);
-        }
-        else{
-
-            console.log(n1_conn);
-            console.log("Connected to Node 1");
-
-            n1_conn.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function (err2, res1){
-                console.log("LOCK TABLES;");
-                if (err2){
-                    console.error(err2);
-                }
-                else{
-
-                    console.log(res1);
-                    n1_conn.query("INSERT INTO " + movie.queryString, function (err3, res2){
-                        console.log("INSERT");
-                        if (err3){
-                            console.error(err3);
-                        }
-                        else{
-                            console.log(res2);
-
-                            n1_conn.commit(function (err4){
-                                console.log("COMMIT");
-                                if (err4){
-                                    console.error(err4);
-                                }
-                                else{                                    
-                                    n1_conn.query("UNLOCK TABLES;", function (err5, res4){
-                                        console.log("END TRANSACTION");
-                                        n1_conn.release();
-                                        if (err5){
-                                            res.send(err5);
-                                            console.error(err5);
-                                        }
-                                        else{
-                                            res.send(res4);
-                                            console.log(res4);
-                                        }
-                                    });
-                                }
-                
-                            });
-                        }
-        
-                    });
-                }
-
-            });
-        }
+test.get('/testFunction', function(req, res){
+    node2.query("SELECT * FROM movies WHERE id=1", function(err, res){
+        console.log(res);
     });
 });
 

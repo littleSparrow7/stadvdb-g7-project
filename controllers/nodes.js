@@ -1,3 +1,5 @@
+import { node1, node2, node3 } from "./pools.js";
+
 /**
  * Inserts movie to the database. Calls callback after executing query.
  * @param {Connection} conn of node to insert to 
@@ -6,9 +8,10 @@
  */
 export function insertMovie(conn, movie, callback){
     var stmt = movie.queryString;
+    var update_stmt = movie.updateString;
 
-    conn.query("INSERT INTO " + stmt, function(err, res){
-        console.log("INSERT TABLE");
+    conn.query("INSERT INTO " + stmt + " ON DUPLICATE KEY UPDATE " + update_stmt, function(err, res){
+        console.log("MODIFY TABLE");
         if(err){
             console.error(err);
             callback(null, 500);
@@ -24,42 +27,22 @@ export function insertMovie(conn, movie, callback){
  * Updates single entry in a database
  * @param {Connection} conn connection to be updated
  * @param {Movie} movie movie to be updated
- * @param {array} array of values to update
+ * @param {function} callback 
  * note, you can change array to sth else to make it easier.
  * see notes in user.js
  */
-export function updateMovie(conn, movie, arr){
-    var update_stmt = movie.updateString;
-    conn.query("UPDATE movies SET " + update_stmt + " WHERE id=" + movie.id, function(err, res){
-        console.log("UPDATE movie with id=" + movie.id);
-        if(err){
-            console.error(err);
-            callback(500);
-        }
-        else{
-            console.log(res);
-            callback(200);
-        }
-    });
+export function updateMovie(conn, movie, callback){
+    insertMovie(conn, movie, callback);
 }
 
 /**
  * Marks single entry in a database as deleted
  * @param {Connection} conn that contains entry
  * @param {id} id of entry to be deleted
+ * @param {function} callback
  */
-export function deleteMovie(conn, id){
-    conn.query("UPDATE movies SET deleted=1 WHERE id=" + movie.id, function(err, res){
-        console.log("DELETE movie with id=" + movie.id);
-        if(err){
-            console.error(err);
-            callback(500);
-        }
-        else{
-            console.log(res);
-            callback(200);
-        }
-    });
+export function deleteMovie(conn, id, callback){
+    insertMovie(conn, movie, callback);
 }
 
 /**
@@ -67,7 +50,7 @@ export function deleteMovie(conn, id){
  * @param {Connection} conn connection of database to be searched
  * @param {Movie} movie object containing values to search 
  */
-export function searchPool(conn, movie){
+export function searchMovie(conn, movie){
     var search_query = "SELECT * FROM movie WHERE ";
     var search_stmt = movie.filterString;
 
@@ -227,5 +210,35 @@ export function unlockTables(conn1, conn2, callback){
         unlockTable(conn2, function(status2){
             callback({conn1: status1, conn2: status2});
         });
+    });
+}
+
+export function findRecord(id, callback){
+    node2.query("SELECT * FROM movies WHERE id=" + id, function(err,res){
+        if (res.length > 0){
+            callback(2);
+        }
+        else {
+            node3.query("SELECT * FROM movies WHERE id=" + id, function(err,res){
+                if (res.length > 0){
+                    callback(3);
+                }
+                else {
+                    node1.query("SELECT * FROM movies WHERE id=" + id, function(err,res){
+                        if (err){
+                            callback(null);
+                        }
+                        else if (res.length > 0){
+                            if (res[0].year < 1980){
+                                callback(2);
+                            }
+                            else{
+                                callback(3);
+                            }
+                        }
+                    });
+                }
+            });
+        }
     });
 }

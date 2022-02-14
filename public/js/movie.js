@@ -12,27 +12,27 @@ class Movie {
         var cols = "movies (`id`";
         var values = " VALUES (" + this.id;
 
-        if (this.title != null){
+        if (this.title != null && this.title != ""){
             cols += ", `name`";
             values += ", '" + this.title + "'";
         }
         
-        if (this.year != null){
+        if (this.year != null && this.year != ""){
             cols += ", `year`";
             values += ", " + this.year;
         }
         
-        if (this.rating != null){
+        if (this.rating != null && this.rating != ""){
             cols += ", `rank`";
             values += ", " + this.rating;
         }
         
-        if (this.nsynced != null){
+        if (this.nsynced != null && this.nsynced != ""){
             cols += ", `nsynced`";
             values += ", " + this.nsynced;
         }
 
-        if (this.deleted != null){
+        if (this.deleted != null && this.deleted != ""){
             cols += ", `deleted`";
             values += ", " + this.deleted;
         }
@@ -45,23 +45,23 @@ class Movie {
     get updateString(){
         var arr = [];
 
-        if (this.title != null){
+        if (this.title != null && this.title != ""){
             arr.push("`name`='" + this.title + "'");
         }
         
-        if (this.year != null){
+        if (this.year != null && this.year != ""){
             arr.push("`year`=" + this.year);
         }
         
-        if (this.rating != null){
+        if (this.rating != null && this.rating != ""){
             arr.push("`rank`=" + this.rating);
         }
         
-        if (this.nsynced != null){
+        if (this.nsynced != null && this.nsynced != ""){
             arr.push("`nsynced`=" + this.nsynced);
         }
 
-        if (this.deleted != null){
+        if (this.deleted != null && this.deleted != ""){
             arr.push("`deleted`=" + this.deleted);
         }
 

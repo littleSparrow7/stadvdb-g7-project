@@ -59,6 +59,6 @@ app.listen(port, hostname, () => console.log(`Server running at: http://${hostna
 
 // sync movies every 30 minutes
 // var job = new CronJob('00 30 * * * *', function(){
-//     syncMovies();
+//     verifyRecordIntegrity();
 // })
 // job.start();

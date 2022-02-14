@@ -1,23 +1,50 @@
 import { nodepath } from './user.js';
+import Movie from './movie.js';
 
 $(document).ready(function(){
+    $("#generic-form").submit(function(e) {
+        e.preventDefault();
 
-    // $('#btn-update-record').click(function(){
-    //     var movie = {
-    //         id: $("#inputID4").val(),
-    //         title: $("#inputTitle4").val(),
-    //         year: $("#inputYear").val(),
-    //         rank: $("#inputRank").val()
-    //     };
+        var movie = new Movie(
+            $("#inputID4").val(),
+            $("#inputTitle4").val(),
+            $("#inputYear").val(),
+            $("#inputRank").val(),
+            2,
+            null);
+        
+        if (movie.title == "")
+            movie.title = null;
+        
+        if (movie.year == "")
+            movie.year = null;
+        
+        if (movie.rank == "")
+            movie.rank = null;
 
-    //     //TODO: update movie
-    //     /**
-    //      * Updates movie from the database based on id number
-    //      * @param { Movie } new details for movie to be updated
-    //      */
-    //     $.post(nodepath + "/updateMovie", movie, function(data){
-    //         console.log(data);
-    //         //update database
-    //     });
-    // });
+        var isValid = true;
+        if (movie.id == "" || movie.id == null){
+            isValid = false;
+        }
+
+        if (movie.title == null && movie.year == null && movie.rank == null){
+            isValid = false;
+        }
+
+        if (isValid){
+            alert("Valid!");
+            /**
+             * Updates movie to the database
+             * @param { Movie } movie without id
+             */
+            $.post(nodepath + "/updateMovie", movie)
+                .done(function(data){
+                    console.log(data);
+                    //add to database
+                });
+        }
+        else{
+            alert("Not Valid!");
+        }
+    });
 });
