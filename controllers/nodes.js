@@ -77,7 +77,17 @@ export function searchPool(pool, obj){
  * @param {function} callback 
  */
 export function lockTableWrite(conn, callback){
-    lockTableWriteSingle(conn, callback, 0);
+    conn.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
+        console.log("LOCK TABLE WRITE SINGLE ");
+        if(err){
+            console.error(err);
+            callback(503);
+        }
+        else{
+            console.log(res);
+            callback(200);
+        }
+    });
 }
 
 /**
@@ -100,35 +110,6 @@ export function lockTablesWrite(conn1, conn2, callback){
             callback({conn1: status, conn2: null});
         }
     }, 0);
-}
-
-/**
- * Recursive function for retrying locking multiple times.
- * @param {Connection} conn open connection to database
- * @param {function} callback returns status code
- * @param {number} retries number of retries 
- */
-export function lockTableWriteSingle(conn, callback, retries){
-    if (retries < retry_count){
-        conn.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
-            console.log("LOCK TABLE WRITE SINGLE " + retries);
-            if(err){
-                console.error(err);
-                callback(503);
-                // // wait 100ms, try again x4
-                // setTimeout(function(){
-                //     lockTableWriteSingle(pool, callback, retries + 1)
-                // }, retry_time);
-            }
-            else{
-                console.log(res);
-                callback(200);
-            }
-        });
-    }
-    else{
-        callback(503);
-    }
 }
 
 /**
