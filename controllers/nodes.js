@@ -100,9 +100,9 @@ export function lockTableWrite(conn, callback){
  * @param {function} callback 
  */
 export function lockTablesWrite(conn1, conn2, callback){
-    lockTableWriteSingle(conn1, function(status){
+    lockTableWrite(conn1, function(status){
         if (status == 200){
-            lockTableWriteSingle(conn2, function(status2){
+            lockTableWrite(conn2, function(status2){
                 callback({conn1: status, conn2: status2});
             }, 0);
         }
