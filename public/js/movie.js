@@ -86,15 +86,9 @@ class Movie {
         if (this.rating != null){
             arr.push("`rank`=" + this.rating);
         }
+
+        arr.push("`deleted`=0");
         
-        if (this.nsynced != null){
-            arr.push("`nsynced`=" + this.nsynced);
-        }
-
-        if (this.deleted != null){
-            arr.push("`deleted`=" + this.deleted);
-        }
-
         return arr.join(" AND ");
     }
 }
