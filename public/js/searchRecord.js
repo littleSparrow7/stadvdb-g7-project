@@ -1,27 +1,47 @@
 import { nodepath } from './user.js';
+import Movie from './movie.js';
 
 $(document).ready(function(){
     // hides info and error msg
     $("#info").hide();
     $("#error").hide();
-    
-    // $('#btn-search-record').click(function(){
-    //     var movie = {
-    //         id: $("#inputID4").val(),
-    //         title: $("#inputTitle4").val(),
-    //         year: $("#inputYear").val(),
-    //         rank: $("#inputRank").val()
-    //     };
 
-    //     //TODO: search movie
-    //     /**
-    //      * Searches for movie in the database based on the corresponding information.
-    //      * Null values are ignored in the search process.
-    //      * @param {Movie} movie partially filled movie object
-    //      */
-    //     $.post(nodepath + "/searchMovie", movie, function(data){
-    //         console.log(data);
-    //         //update database
-    //     });
-    // });
+    
+    $("#generic-form").submit(function(e) {
+        e.preventDefault();
+
+        var body = new Movie(
+            $("#inputID4").val(),
+            $("#inputTitle4").val(),
+            $("#inputYear").val(),
+            $("#inputRank").val(),
+            null,
+            0);
+        
+
+        var movie = {};
+        movie.deleted = 0;
+
+        if (body.id != "")
+            movie.id = body.id;
+
+        if (body.title != "")
+            movie.title = body.title;
+        
+        if (body.year != "")
+            movie.year = body.year;
+        
+        if (body.rank != "")
+            movie.rank = body.rank;
+
+        /**
+             * Updates movie to the database
+             * @param { Movie } movie without id
+             */
+        $.get(nodepath + "/searchMovie", movie, function(data){
+            alert(data[0]);
+            alert(data[0].name);
+            // returns as array of RowDataPacket {id: 1, name: '#7 Train: An Immigrant Journey, The', year: 2000, rank: null, nsynced: 0, …}
+        });
+    });
 });

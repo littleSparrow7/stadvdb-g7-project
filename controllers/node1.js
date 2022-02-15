@@ -1,4 +1,4 @@
-import { node1, node2, node3, getConnections } from './pools.js';
+import { node1, node2, node3, getConnections, getConnection } from './pools.js';
 import * as sql from "./nodes.js";
 import Movie from '../public/js/movie.js';
 import { uncommittedMovies } from '../public/js/user.js';
@@ -432,8 +432,28 @@ export function deleteMovie(req, res){
 }
 
 export function searchMovie(req, res){
-    //search node 1, node 2, and node 3
-    res.send("SEARCH MOVIE");
+    var params = new URLSearchParams(req._parsedUrl.query);
+    
+    var body = {
+        id: params.get('id'),
+        title: params.get('title'),
+        year: params.get('year'),
+        rating: params.get('rating'),
+        nsynced: params.get('nsynced'),
+        deleted: params.get('deleted')
+    };
+
+    var movie = new Movie(body.id, body.title, body.year, body.rating, body.nsynced, body.deleted);
+
+    getConnection(node1, function(conn1){
+        sql.searchMovie(conn1, movie, function(result){
+            conn1.release();
+            res.send(result);
+        });
+    })
+    //search node 1
+    // if node1 not available, search node 2, and node 3
+    console.log("SEARCH MOVIE");
 }
 
 export function verifyRecordIntegrity(req, res){

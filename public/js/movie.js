@@ -71,19 +71,19 @@ class Movie {
     get filterString(){
         var arr = [];
 
-        if (this.id != null){
+        if (this.id != null && this.id != ""){
             arr.push("`id`=" + this.id);
         }
 
-        if (this.title != null){
+        if (this.title != null && this.title != ""){
             arr.push("`name` LIKE '%" + this.title + "%'");
         }
         
-        if (this.year != null){
+        if (this.year != null && this.year != ""){
             arr.push("`year`=" + this.year);
         }
         
-        if (this.rating != null){
+        if (this.rating != null && this.rating != ""){
             arr.push("`rank`=" + this.rating);
         }
 

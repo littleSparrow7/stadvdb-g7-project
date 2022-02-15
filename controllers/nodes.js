@@ -50,13 +50,13 @@ export function deleteMovie(conn, id, callback){
  * @param {Connection} conn connection of database to be searched
  * @param {Movie} movie object containing values to search 
  */
-export function searchMovie(conn, movie){
-    var search_query = "SELECT * FROM movie WHERE ";
+export function searchMovie(conn, movie, callback){
+    var search_query = "SELECT * FROM movies WHERE ";
     var search_stmt = movie.filterString;
 
     //if there are no fields/constraints
     if (search_stmt == "")
-        search_query = "SELECT * FROM movie";
+        search_query = "SELECT * FROM movies";
 
     conn.query(search_query + search_stmt, function(err, res){
         console.log("SELECT movie: " + search_stmt);
