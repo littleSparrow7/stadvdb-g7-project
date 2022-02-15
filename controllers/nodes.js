@@ -1,98 +1,123 @@
-import { node1, node2, node3 } from "./pools.js";
+import { checkNodeActive, node1, node2, node3 } from "./pools.js";
 
 /**
  * Inserts movie to the database. Calls callback after executing query.
- * @param {Connection} conn of node to insert to 
+ * @param {number, Connection} connInfo of node to insert to 
  * @param {Movie} movie to be inserted
  * @param {function} callback contains id and status code
  */
-export function insertMovie(conn, movie, callback){
+export function insertMovie(connInfo, movie, callback){
     var stmt = movie.queryString;
     var update_stmt = movie.updateString;
-    
+    var conn = connInfo.conn;
+
     console.log("IN FUNCTION");
     console.log(movie);
     console.log(stmt);
     console.log(update_stmt);
 
-    conn.query("INSERT INTO " + stmt + " ON DUPLICATE KEY UPDATE " + update_stmt, function(err, res){
-        console.log("MODIFY TABLE");
-        if(err){
-            console.error(err);
+    if (checkNodeActive(connInfo.nodeid)){
+        conn.query("INSERT INTO " + stmt + " ON DUPLICATE KEY UPDATE " + update_stmt, function(err, res){
+            console.log("MODIFY TABLE");
+            if(err){
+                console.error(err);
+                callback(null, 500);
+            }
+            else{
+                console.log(res);
+                callback(res.insertId, 200);
+            }
+        });
+    }
+    else{
+        unlockTable(conn, function(status){
             callback(null, 500);
-        }
-        else{
-            console.log(res);
-            callback(res.insertId, 200);
-        }
-    });
+        });
+    }
 }
 
 /**
  * Updates single entry in a database
- * @param {Connection} conn connection to be updated
+ * @param {number, Connection} connInfo connection to be updated
  * @param {Movie} movie movie to be updated
  * @param {function} callback 
  * note, you can change array to sth else to make it easier.
  * see notes in user.js
  */
-export function updateMovie(conn, movie, callback){
-    insertMovie(conn, movie, callback);
+export function updateMovie(connInfo, movie, callback){
+    insertMovie(connInfo, movie, callback);
 }
 
 /**
  * Marks single entry in a database as deleted
- * @param {Connection} conn that contains entry
+ * @param {number, Connection} connInfo that contains entry
  * @param {movie} movie of entry to be deleted
  * @param {function} callback
  */
-export function deleteMovie(conn, movie, callback){
-    insertMovie(conn, movie, callback);
+export function deleteMovie(connInfo, movie, callback){
+    insertMovie(connInfo, movie, callback);
 }
 
 /**
  * Searches for entries matching specific conditions in the database
- * @param {Connection} conn connection of database to be searched
+ * @param {number, Connection} connInfo connection of database to be searched
  * @param {Movie} movie object containing values to search 
+ * @param {function} callback
  */
-export function searchMovie(conn, movie, callback){
+export function searchMovie(connInfo, movie, callback){
     var search_query = "SELECT * FROM movies WHERE ";
     var search_stmt = movie.filterString;
+    var conn = connInfo.conn;
 
     //if there are no fields/constraints
     if (search_stmt == "")
         search_query = "SELECT * FROM movies";
 
-    conn.query(search_query + search_stmt, function(err, res){
-        console.log("SELECT movie: " + search_stmt);
-        if(err){
-            console.error(err);
-            callback(res);
-        }
-        else{
-            console.log(res);
-            callback(res);
-        }
-    });
+    if (checkNodeActive(connInfo.nodeid)){
+        conn.query(search_query + search_stmt, function(err, res){
+            console.log("SELECT movie: " + search_stmt);
+            if(err){
+                console.error(err);
+                callback(res);
+            }
+            else{
+                console.log(res);
+                callback(res);
+            }
+        });
+    }
+    else{
+        unlockTable(conn, function(status){
+            callback([]);
+        });
+    }
 }
 
 /**
  * Locks the table for writing. Other connections cannot read or write.
- * @param {Connection} conn
+ * @param {number, Connection} connInfo
  * @param {function} callback 
  */
-export function lockTableWrite(conn, callback){
-    conn.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
-        console.log("LOCK TABLE WRITE");
-        if(err){
-            console.error(err);
-            callback(503);
-        }
-        else{
-            console.log(res);
-            callback(200);
-        }
-    });
+export function lockTableWrite(connInfo, callback){
+    var conn = connInfo.conn;
+
+    if (checkNodeActive(connInfo.nodeid)){
+        conn.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
+            console.log("LOCK TABLE WRITE");
+            if(err){
+                console.error(err);
+                callback(503);
+            }
+            else{
+                console.log(res);
+                callback(200);
+            }
+        });
+    }
+    else{
+        conn.release();
+        callback(500);
+    }
 }
 
 /**
@@ -100,8 +125,8 @@ export function lockTableWrite(conn, callback){
  * Returns statuses in callback
  * conn2 is not locked if conn1 fails
  * 
- * @param {Connection} conn1 
- * @param {Connection} conn2 
+ * @param {number, Connection} conn1
+ * @param {number, Connection} conn2 
  * @param {function} callback 
  */
 export function lockTablesWrite(conn1, conn2, callback){
@@ -119,44 +144,62 @@ export function lockTablesWrite(conn1, conn2, callback){
 
 /**
  * Locks the table for reading. Other connections cannot write.
- * @param {Connection} conn
+ * @param {number, Connection} connInfo
  * @param {function} callback 
  */
- export function lockTableRead(conn, callback){
-    conn.query("LOCK TABLE movies READ;", function(err, res){
-        console.log("LOCK TABLE READ");
-        if(err){
-            console.error(err);
-            callback(503);
-        }
-        else{
-            console.log(res);
-            callback(200);
-        }
-    });
+ export function lockTableRead(connInfo, callback){
+    var conn = connInfo.conn;
+
+    if (checkNodeActive(connInfo.nodeid)){
+        conn.query("LOCK TABLE movies READ;", function(err, res){
+            console.log("LOCK TABLE READ");
+            if(err){
+                console.error(err);
+                callback(503);
+            }
+            else{
+                console.log(res);
+                callback(200);
+            }
+        });
+    }
+    else{
+        callback(500);
+    }
 }
 
 /**
  * Commits transactions for a connection
  * If failed, rolls back transaction
  * Sends 405 (Method Not Allowed) if failed
- * @param {Connection} conn
+ * @param {number, Connection} connInfo
  * @param {function} callback 
  */
-export function commitOrRollBackTransaction(conn, callback){
-    conn.commit(function(err){
-        console.log("COMMIT");
-        if (err){
-            console.error(err);
-            rollbackTransaction(conn, function(rollbackStatus){
-                callback({commit: 405, rollback: rollbackStatus});
-            })
-        }
-        else{
-            console.log("SUCCESSFULLY COMMITTED");
-            callback({commit: 200, rollback: null});
-        }
-    });
+export function commitOrRollBackTransaction(connInfo, callback){
+    var conn = connInfo.conn;
+
+    if (checkNodeActive(connInfo.nodeid)){
+        conn.commit(function(err){
+            console.log("COMMIT");
+            if (err){
+                console.error(err);
+                rollbackTransaction(conn, function(rollbackStatus){
+                    callback({commit: 405, rollback: rollbackStatus});
+                })
+            }
+            else{
+                console.log("SUCCESSFULLY COMMITTED");
+                callback({commit: 200, rollback: null});
+            }
+        });
+    }
+    else{
+        rollbackTransaction(conn, function(rollbackStatus){
+            unlockTable(conn, function(status){
+                callback({commit: 500, rollback: 500});
+            });
+        });
+    }
 }
 
 /**
@@ -219,17 +262,17 @@ export function unlockTables(conn1, conn2, callback){
 }
 
 export function findRecord(id, callback){
-    node2.query("SELECT * FROM movies WHERE id=" + id, function(err,res){
+    queryFunction({nodeid: 2, link: node2}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
         if (res.length > 0){
             callback(2);
         }
         else {
-            node3.query("SELECT * FROM movies WHERE id=" + id, function(err,res){
+            queryFunction({nodeid: 3, link: node3}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
                 if (res.length > 0){
                     callback(3);
                 }
                 else {
-                    node1.query("SELECT * FROM movies WHERE id=" + id, function(err,res){
+                    queryFunction({nodeid: 1, link: node1}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
                         if (err){
                             callback(null);
                         }
@@ -246,4 +289,25 @@ export function findRecord(id, callback){
             });
         }
     });
+}
+
+
+export function queryFunction(obj, query, callback){
+    var link = obj.link;
+
+    if (obj.link != null)
+        link = obj.link;
+    
+    if (obj.pool != null)
+        link = obj.pool;
+
+    if (obj.conn != null)
+        link = obj.conn;
+
+    if (checkNodeActive(obj.nodeid)){
+        link.query(query, callback);
+    }
+    else{
+        callback(true, []);
+    }
 }

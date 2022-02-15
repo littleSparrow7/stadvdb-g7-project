@@ -39,17 +39,55 @@ export var node3 = mysql.createPool({
     multipleStatements: true
 });
 
-export function getConnection(pool, callback){
-    pool.getConnection(function(err, conn){
-        if (err){
-            console.error(err);
-            callback(null);
-        }
-        else{
-            console.log("Connected to the node");
-            callback(conn);
-        }
-    })
+var node1IsActive = true;
+var node2IsActive = true;
+var node3IsActive = true;
+
+export function checkNodeActive(nodeid){
+    if (nodeid == 1)
+        return node1IsActive;
+    else if (nodeid == 2)
+        return node2IsActive;
+    else if (nodeid == 3)
+        return node3IsActive;
+}
+
+export function setNodeInactive(nodeid){
+    if (nodeid == 1)
+        node1IsActive = false;
+    else if (nodeid == 2)
+        node2IsActive = false;
+    else if (nodeid == 3)
+        node3IsActive = false;
+}
+
+export function setNodeActive(nodeid){
+    if (nodeid == 1)
+        node1IsActive = true;
+    else if (nodeid == 2)
+        node2IsActive = true;
+    else if (nodeid == 3)
+        node3IsActive = true;
+}
+
+export function getConnection(poolInfo, callback){
+    var pool = poolInfo.pool;
+
+    if (checkNodeActive(poolInfo.nodeid)){
+        pool.getConnection(function(err, conn){
+            if (err){
+                console.error(err);
+                callback(null);
+            }
+            else{
+                console.log("Connected to the node");
+                callback(conn);
+            }
+        });
+    }
+    else{
+        callback(null);
+    }
 }
 
 export function getConnections(pool1, pool2, callback){

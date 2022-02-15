@@ -1,6 +1,6 @@
 import express from 'express';
 export var test = express.Router();
-import {getConnection, node1, node2, node3} from '../controllers/pools.js';
+import {getConnection, node1, node2, node3, setNodeActive, setNodeInactive} from '../controllers/pools.js';
 import * as sql from '../controllers/nodes.js';
 import * as node1Controller from '../controllers/node1.js';
 import Movie from '../public/js/movie.js';
@@ -146,6 +146,36 @@ test.get('/testFunction', function(req, res){
     node1.query("UPDATE movies SET nsynced=1 WHERE id=412359", function(err, res){
         console.log(res);
     });
+});
+
+test.get('/node1/inactive', function(req, res){
+    setNodeInactive(1);
+    res.send("DONE");
+});
+
+test.get('/node2/inactive', function(req, res){
+    setNodeInactive(2);
+    res.send("DONE");
+});
+
+test.get('/node3/inactive', function(req, res){
+    setNodeInactive(3);
+    res.send("DONE");
+});
+
+test.get('/node1/active', function(req, res){
+    setNodeActive(1);
+    res.send("DONE");
+});
+
+test.get('/node2/active', function(req, res){
+    setNodeActive(2);
+    res.send("DONE");
+});
+
+test.get('/node3/active', function(req, res){
+    setNodeActive(3);
+    res.send("DONE");
 });
 
 // test.get('/deleteOne', function(req,res){
