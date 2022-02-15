@@ -370,6 +370,8 @@ export function searchMovie(req, res){
  * @param {number} nodeid number of the node (2 for node2; 3 for node3)
  */
 export function verifyRecordIntegrity(nodeid, callback){
+    console.log("VERIFY RECORD INTEGRITY");
+
     var node = null;
     var query = "";
     if (nodeid == 2){
@@ -415,6 +417,7 @@ export function verifyRecordIntegrity(nodeid, callback){
         });
     }
     else{
+        console.log("FINISHED VERIFYING FILE INTEGRITY");
         callback(200);
     }
 }
