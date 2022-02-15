@@ -21,7 +21,7 @@ test.get('/check1', function(req,res){
 });
 
 test.get('/check2', function(req,res){
-    node2.query("select * from movies order by id desc limit 10", function(error, result){
+    node2.query("select * from movies order by id desc limit 20", function(error, result){
         if(error){
             res.send(error);
         }
@@ -118,7 +118,7 @@ test.get('/killProcessLists', function(req, res){
             node3.query(query, function(err, result3){
                 res.send({result1, result2, result3});
                 result3.forEach((p) => {
-                    if (p.Command == "Sleep"){
+                    if (p.Command == "Sleep" || p.State=="Waiting for table metadata lock"){
                         node3.query(kill_query + p.Id);
                         console.log(p.Id);
                     }
@@ -126,7 +126,7 @@ test.get('/killProcessLists', function(req, res){
             });
 
             result2.forEach((p) => {
-                if (p.Command == "Sleep"){
+                if (p.Command == "Sleep" || p.State=="Waiting for table metadata lock"){
                     node2.query(kill_query + p.Id);
                     console.log(p.Id);
                 }
@@ -143,13 +143,13 @@ test.get('/killProcessLists', function(req, res){
 })
 
 test.get('/testFunction', function(req, res){
-    node2.query("SELECT * FROM movies WHERE id=1", function(err, res){
+    node1.query("UPDATE movies SET nsynced=1 WHERE id=412359", function(err, res){
         console.log(res);
     });
 });
 
 // test.get('/deleteOne', function(req,res){
-//     node1.query("DELETE FROM movies WHERE id=412342", function(err,result){
+//     node3.query("DELETE FROM movies WHERE id >= 412327 AND id <= 412358", function(err,result){
 //         res.send(result);
 //     });
 // });
