@@ -444,20 +444,110 @@ export function searchMovie(req, res){
     };
 
     var movie = new Movie(body.id, body.title, body.year, body.rating, body.nsynced, body.deleted);
+    var data = {
+        error : false,
+        result: null
+    };
 
-    getConnection(node1, function(conn1){
-        sql.searchMovie(conn1, movie, function(result){
-            conn1.release();
-            res.send(result);
-        });
-    })
+    getConnection(node1, function(conn1){ 
+        if (conn1 != null){
+            sql.lockTableRead(conn1, function(status){
+                if (status == 200){
+                    sql.searchMovie(conn1, movie, function(result){
+                        sql.unlockTable(conn1, function(status){
+                            data.result = result;
+                            res.send(data);
+                        })
+                    });
+                }
+                else{
+                    res.send(data);
+                }
+            });
+        }
+        else{
+            getConnection(node2, function(conn2){
+                getConnection(node3, function(conn3){
+                    var conns = [];
+                    if (conn2 != null){
+                        conns.push(conn2);
+                    }
+
+                    if (conn3 != null){
+                        conns.push(conn3);
+                    }
+
+                    if (conns.length > 0){
+                        sql.lockTableRead(conns[0], function(status2){
+                            if (conns.length > 1){
+                                sql.lockTableRead(conns[1], function(status3){
+                                    if (status2 != 200){
+                                        conns.shift();
+                                    }
+                                    else if (status3 != 200){
+                                        conns.pop();
+                                    }
+
+                                    if (conns.length > 0){
+                                        sql.searchMovie(conns[0], movie, function(result1){
+                                            if (conns.length > 1){
+                                                sql.searchMovie(conns[1], movie, function(result2){
+                                                    sql.unlockTables(conns[0], conns[1], function(status){
+                                                        data.result = result1.concat(result2);
+                                                        res.send(data);
+                                                    })
+                                                });
+                                            }
+                                            else{
+                                                sql.unlockTable(conns[0], function(status){
+                                                    data.result = result1;
+                                                    res.send(data);
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else{
+                                        data.error = true;
+                                        data.result = [];
+                                        res.send(data);
+                                    }
+                                });
+                            }
+                            else{
+                                if (status2 == 200){
+                                    sql.searchMovie(conns[0], movie, function(result){
+                                        sql.unlockTable(conns[0], function(status){
+                                            data.result = result;
+                                            res.send(data);
+                                        });
+                                    });
+                                }
+                                else {
+                                    sql.unlockTable(conns[0], function(status){
+                                        data.error = true;
+                                        data.result = [];
+                                        res.send(data);
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    else{
+                        data.error = true;
+                        data.result = [];
+                        console.log("FAILED TO CONNECT TO DATABASES");
+                    }
+                });
+            });
+        }
+    });
     //search node 1
     // if node1 not available, search node 2, and node 3
     console.log("SEARCH MOVIE");
 }
 
 export function verifyRecordIntegrity(req, res){
-    
+    //check if contents are correct based on year
 }
 
 export function syncMovies(){

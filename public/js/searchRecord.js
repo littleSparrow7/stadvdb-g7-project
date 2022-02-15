@@ -39,8 +39,8 @@ $(document).ready(function(){
              * @param { Movie } movie without id
              */
         $.get(nodepath + "/searchMovie", movie, function(data){
-            alert(data[0]);
-            alert(data[0].name);
+            alert(data.result[0]);
+            alert(data.result[0].name);
             // returns as array of RowDataPacket {id: 1, name: '#7 Train: An Immigrant Journey, The', year: 2000, rank: null, nsynced: 0, …}
         });
     });

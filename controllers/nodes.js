@@ -35,13 +35,32 @@ export function updateMovie(conn, movie, callback){
     insertMovie(conn, movie, callback);
 }
 
+export function updateMovies(conn, movies, copy, fail, callback){
+    if (movies.length > 0){
+        var movie = movies.shift();
+
+        updateMovie(conn, movie, function(id, status){
+            if (status != 200){
+                fail.push(movie);
+            }
+            
+            copy.push(movie);
+    
+            updateMovies(conn, movies, copy, fail, callback);
+        });
+    }
+    else{
+        callback({copy, fail});
+    }
+}
+
 /**
  * Marks single entry in a database as deleted
  * @param {Connection} conn that contains entry
- * @param {id} id of entry to be deleted
+ * @param {movie} movie of entry to be deleted
  * @param {function} callback
  */
-export function deleteMovie(conn, id, callback){
+export function deleteMovie(conn, movie, callback){
     insertMovie(conn, movie, callback);
 }
 
