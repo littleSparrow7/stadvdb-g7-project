@@ -14,7 +14,7 @@ $(document).ready(function(){
             null,
             null,
             null,
-            null,
+            2,
             1);
 
         var isValid = true;

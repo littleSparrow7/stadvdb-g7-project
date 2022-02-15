@@ -9,6 +9,11 @@ import { node1, node2, node3 } from "./pools.js";
 export function insertMovie(conn, movie, callback){
     var stmt = movie.queryString;
     var update_stmt = movie.updateString;
+    
+    console.log("IN FUNCTION");
+    console.log(movie);
+    console.log(stmt);
+    console.log(update_stmt);
 
     conn.query("INSERT INTO " + stmt + " ON DUPLICATE KEY UPDATE " + update_stmt, function(err, res){
         console.log("MODIFY TABLE");
@@ -33,25 +38,6 @@ export function insertMovie(conn, movie, callback){
  */
 export function updateMovie(conn, movie, callback){
     insertMovie(conn, movie, callback);
-}
-
-export function updateMovies(conn, movies, copy, fail, callback){
-    if (movies.length > 0){
-        var movie = movies.shift();
-
-        updateMovie(conn, movie, function(id, status){
-            if (status != 200){
-                fail.push(movie);
-            }
-            
-            copy.push(movie);
-    
-            updateMovies(conn, movies, copy, fail, callback);
-        });
-    }
-    else{
-        callback({copy, fail});
-    }
 }
 
 /**
@@ -137,7 +123,7 @@ export function lockTablesWrite(conn1, conn2, callback){
  * @param {function} callback 
  */
  export function lockTableRead(conn, callback){
-    conn.query("SET autocommit = 0; LOCK TABLE movies READ;", function(err, res){
+    conn.query("LOCK TABLE movies READ;", function(err, res){
         console.log("LOCK TABLE READ");
         if(err){
             console.error(err);

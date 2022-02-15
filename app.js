@@ -5,7 +5,8 @@ import { test } from './tests/test.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import { CronJob } from 'cron';
-import { syncMovies } from './controllers/node1.js';
+import { syncMovies, verifyRecordIntegrity } from './controllers/node1.js';
+import { NODE } from './public/js/user.js';
 
 const app = express();
 const port = 8000;
@@ -57,8 +58,12 @@ app.get('/searchResults', (req, res) => (
 
 app.listen(port, hostname, () => console.log(`Server running at: http://${hostname}:${port}`));
 
+// verifyRecordIntegrity();
 // sync movies every 30 minutes
-// var job = new CronJob('00 30 * * * *', function(){
-//     verifyRecordIntegrity();
-// })
-// job.start();
+var job = new CronJob('00 */30  * * * *', function(){
+    console.log("SYNCING FILES");
+    verifyRecordIntegrity(NODE, function(status){
+        syncMovies();
+    });
+});
+job.start();

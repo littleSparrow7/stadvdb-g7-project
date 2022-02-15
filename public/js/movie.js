@@ -14,7 +14,7 @@ class Movie {
 
         if (this.title != null && this.title != ""){
             cols += ", `name`";
-            values += ", '" + this.title + "'";
+            values += ", '" + this.title.replaceAll("'", "''") + "'";
         }
         
         if (this.year != null && this.year != ""){
@@ -27,12 +27,12 @@ class Movie {
             values += ", " + this.rating;
         }
         
-        if (this.nsynced != null && this.nsynced != ""){
+        if (this.nsynced !== null && this.nsynced !== ""){
             cols += ", `nsynced`";
             values += ", " + this.nsynced;
         }
 
-        if (this.deleted != null && this.deleted != ""){
+        if (this.deleted !== null && this.deleted !== ""){
             cols += ", `deleted`";
             values += ", " + this.deleted;
         }
@@ -46,22 +46,23 @@ class Movie {
         var arr = [];
 
         if (this.title != null && this.title != ""){
-            arr.push("`name`='" + this.title + "'");
+            arr.push("`name`='" + this.title.replaceAll("'", "''") + "'");
         }
         
         if (this.year != null && this.year != ""){
             arr.push("`year`=" + this.year);
         }
         
-        if (this.rating != null && this.rating != ""){
+        if (this.rating !==null && this.rating !== ""){
             arr.push("`rank`=" + this.rating);
         }
         
-        if (this.nsynced != null && this.nsynced != ""){
+
+        if (this.nsynced !== null && this.nsynced !== ""){
             arr.push("`nsynced`=" + this.nsynced);
         }
 
-        if (this.deleted != null && this.deleted != ""){
+        if (this.deleted !== null && this.deleted !== ""){
             arr.push("`deleted`=" + this.deleted);
         }
 
@@ -76,14 +77,14 @@ class Movie {
         }
 
         if (this.title != null && this.title != ""){
-            arr.push("`name` LIKE '%" + this.title + "%'");
+            arr.push("`name` LIKE '%" + this.title.replaceAll("'", "''") + "%'");
         }
         
         if (this.year != null && this.year != ""){
             arr.push("`year`=" + this.year);
         }
         
-        if (this.rating != null && this.rating != ""){
+        if (this.rating !== null && this.rating !== ""){
             arr.push("`rank`=" + this.rating);
         }
 
