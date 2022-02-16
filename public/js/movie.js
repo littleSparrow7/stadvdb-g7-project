@@ -85,7 +85,7 @@ class Movie {
         }
         
         if (this.rating !== null && this.rating !== ""){
-            arr.push("`rank`=" + this.rating);
+            arr.push("`rank` LIKE " + this.rating);
         }
 
         arr.push("`deleted`=0");
