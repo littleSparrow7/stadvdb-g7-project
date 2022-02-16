@@ -9,6 +9,9 @@ $(document).ready(function(){
     $("#delete-form").submit(function(e) {
         e.preventDefault();
 
+        $('#info').text("Deleting movie record...please wait");
+        $('#info').show();
+
         var movie = new Movie(
             $("#inputID4").val(),
             null,
@@ -46,7 +49,7 @@ $(document).ready(function(){
                 }
                 else{
                     $('#error').hide();
-                    $('#info').text("Successfully inserted");
+                    $('#info').text("Record successfully deleted");
                     $('#info').show();
                 }
             });

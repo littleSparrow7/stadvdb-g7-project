@@ -8,6 +8,9 @@ $(document).ready(function(){
     $("#add-form").submit(function(e) {
         e.preventDefault();
 
+        $('#info').text("Adding movie record...please wait");
+        $('#info').show();
+
         var movie = new Movie(
             null,
             $("#inputTitle4").val(),
@@ -43,12 +46,12 @@ $(document).ready(function(){
                 }
                 else if (!data.node1.inserted){
                     $("#info").hide();
-                    $('#error').text("Failed to insert to database");
+                    $('#error').text("Failed to add to database");
                     $('#error').show();
                 }
                 else{
                     $('#error').hide();
-                    $('#info').text("Successfully inserted");
+                    $('#info').text("Record successfully added");
                     $('#info').show();
                 }
                 
