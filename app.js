@@ -7,7 +7,7 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import { CronJob } from 'cron';
 import { syncMovies, verifyRecordIntegrity } from './controllers/nodeController.js';
-import { NODE } from './public/js/user.js';
+import { NODE, checkUpdating } from './public/js/user.js';
 import 'dotenv/config';
 
 const app = express();
@@ -64,10 +64,12 @@ app.listen(port, hostname, () => console.log(`Server running at: http://${hostna
 // TODO: cronJob
 var job = new CronJob('00 */30  * * * *', function(){
     console.log("SYNCING FILES");
-    verifyRecordIntegrity(NODE, function(status){
-        syncMovies(function(){
-    
+    if (!checkUpdating()){
+        verifyRecordIntegrity(NODE, function(status){
+            syncMovies(function(){
+        
+            });
         });
-    });
+    }
 });
 job.start();

@@ -1,3 +1,4 @@
+import { setNotUpdating, setUpdating } from "../public/js/user.js";
 import { checkNodeActive, node1, node2, node3 } from "./pools.js";
 
 /**
@@ -100,6 +101,7 @@ export function searchMovie(connInfo, movie, callback){
  */
 export function lockTableWrite(connInfo, callback){
     var conn = connInfo.conn;
+    setUpdating();
 
     if (checkNodeActive(connInfo.nodeid)){
         conn.query("SET autocommit = 0; LOCK TABLE movies WRITE;", function(err, res){
@@ -107,6 +109,7 @@ export function lockTableWrite(connInfo, callback){
             if(err){
                 console.error(err);
                 callback(503);
+                setNotUpdating();
             }
             else{
                 console.log(res);
@@ -115,6 +118,7 @@ export function lockTableWrite(connInfo, callback){
         });
     }
     else{
+        setNotUpdating();
         conn.release();
         callback(500);
     }
@@ -246,6 +250,7 @@ export function rollbackTransaction(conn, callback){
 export function unlockTable(conn, callback){
     conn.query("UNLOCK TABLES", function(err){
         console.log("UNLOCK TABLE");
+        setNotUpdating();
         conn.release();
 
         if(err){
