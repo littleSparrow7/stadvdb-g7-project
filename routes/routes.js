@@ -5,6 +5,10 @@ import * as node3Controller from "../controllers/node3.js";
 
 export var router = express.Router();
 
+// GET request for getting top ten movies
+router.get('/topTen', node1Controller.getTopTen);
+router.get('/recentTen', node1Controller.getRecentTen);
+
 // *** NODE 1 ***
 // POST request for adding a movie from node1
 router.post('/node1/addMovie', node1Controller.addMovie);

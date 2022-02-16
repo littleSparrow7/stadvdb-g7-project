@@ -894,3 +894,135 @@ function syncTwoNodes(query, nodeInfo, callback){
         }
     });
 }
+
+export function getRecentTen(req, res){
+    var query = "SELECT * FROM movies ORDER BY `id` DESC LIMIT 10";
+
+    retrieveDataFromNode1(query, function(status, result){
+        if (status == 200){
+            res.send(result);
+        }
+        else{
+            retrieveDataFromNode2And3(query, function(status, result){
+                if (status == 200){
+                    var data = result.sort((a, b) => (a.id > b.id)? 1 : ((b.id > a.id)? -1 : 0));
+
+                    res.send(data.slice(0, 10));
+                }
+                else{
+                    res.send([]);
+                }
+            });
+        }
+    });
+}
+
+export function getTopTen(req, res){
+    var query = "SELECT * FROM movies ORDER BY `rank` DESC LIMIT 10";
+
+    retrieveDataFromNode1(query, function(status, result){
+        if (status == 200){
+            res.send(result);
+        }
+        else{
+            retrieveDataFromNode2And3(query, function(status, result){
+                if (status == 200){
+                    var data = result.sort((a, b) => (a.rank > b.rank)? 1 : ((b.rank > a.rank)? -1 : 0));
+
+                    res.send(data.slice(0, 10));
+                }
+                else{
+                    res.send([]);
+                }
+            });
+        }
+    });
+}
+
+function retrieveDataFromNode1(query, callback){
+    var node1Info = {
+        nodeid: 1,
+        pool: node1
+    };
+
+    getConnection(node1Info, function(conn1){
+        if (conn1 != null){
+            var conn1Info = {
+                nodeid: 1,
+                conn: conn1
+            };
+
+            sql.lockTableRead(conn1Info, function(status){
+                if (status == 200){
+                    sql.queryFunction(conn1Info, query, function(err, res){
+                        sql.unlockTable(conn1Info.conn, function(status){
+                            if (err){
+                                callback(500, res);
+                            }
+                            else{
+                                callback(200, res);
+                            }
+                        });
+                    });
+                }
+                else{
+                    sql.unlockTable(conn1Info.conn, function(status){
+                        callback(500, []);
+                    });
+                }
+            });
+        }
+        else{
+            callback(500, []);
+        }
+    });
+}
+
+function retrieveDataFromNode2And3(query, callback){
+    var node2Info = {
+        nodeid: 2,
+        pool: node2
+    };
+
+    var node3Info = {
+        nodeid: 3,
+        pool: node3
+    };
+
+    getConnections(node2Info, node3Info, function(conn2, conn3){
+        if (conn2 != null && conn3 != null){
+            var conn2Info = {
+                nodeid: 2,
+                conn: conn2
+            };
+        
+            var conn3Info = {
+                nodeid: 3,
+                conn: conn3
+            };
+        
+            sql.lockTablesRead(conn2, conn3, function(status){
+                if (status.conn1 == 200 && status.conn2 == 200){
+                    sql.queryFunction(conn2Info, query, function(err2, res2){
+                        sql.queryFunction(conn3Info, query, function(err3, res3){
+                            sql.unlockTables(conn2Info.conn, conn3Info.conn, function(status){
+                                if (err2 && err3){
+                                    callback(500, []);
+                                }
+                                else{
+                                    callback(200, res2.concat(res3));
+                                }
+                            });
+                        });
+                    });
+                }
+                else{
+                    callback(500, []);
+                }
+            });
+        }
+        else{
+            callback(500, []);
+        }
+    });
+}

@@ -134,7 +134,7 @@ export function lockTablesWrite(conn1, conn2, callback){
         if (status == 200){
             lockTableWrite(conn2, function(status2){
                 callback({conn1: status, conn2: status2});
-            }, 0);
+            });
         }
         else{
             callback({conn1: status, conn2: null});
@@ -167,6 +167,20 @@ export function lockTablesWrite(conn1, conn2, callback){
         callback(500);
     }
 }
+
+export function lockTablesRead(conn1, conn2, callback){
+    lockTablesRead(conn1, function(status){
+        if (status == 200){
+            lockTableRead(conn2, function(status2){
+                callback({conn1: status, conn2: status2});
+            });
+        }
+        else{
+            callback({conn1: status, conn2: null});
+        }
+    }, 0);
+}
+
 
 /**
  * Commits transactions for a connection
