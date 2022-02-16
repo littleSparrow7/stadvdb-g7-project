@@ -9,7 +9,9 @@ $(document).ready(function(){
     
     $("#generic-form").submit(function(e) {
         e.preventDefault();
-
+        
+        $('#searchTable').empty();
+        
         var body = new Movie(
             $("#inputID4").val(),
             $("#inputTitle4").val(),
@@ -48,6 +50,16 @@ $(document).ready(function(){
                 $('#error').hide();
                 $('#info').text("Successfully retrieved the data");
                 $('#info').show();
+
+                for (var i = 0; i < data.result.length; i++){
+                    $('#searchTable').append(`<tr>
+                                                <td class="numbers">${data.result[i].id}</td>
+                                                <td class="words">${data.result[i].name}</td>
+                                                <td class="numbers">${data.result[i].year}</td>
+                                                <td class="numbers">${data.result[i].rank}</td>
+                                            </tr>`);
+                }
+                
             }
             
             // TODO
