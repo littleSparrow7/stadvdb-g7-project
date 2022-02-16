@@ -23,15 +23,15 @@ $(document).ready(function(){
         if (movie.year == "")
             movie.year = null;
         
-        if (movie.rank == "")
-            movie.rank = null;
+        if (movie.rating == "")
+            movie.rating = null;
 
         var isValid = true;
         if (movie.id == "" || movie.id == null){
             isValid = false;
         }
 
-        if (movie.title == null && movie.year == null && movie.rank == null){
+        if (movie.title == null && movie.year == null && movie.rating == null){
             isValid = false;
         }
 

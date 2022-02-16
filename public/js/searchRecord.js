@@ -31,8 +31,8 @@ $(document).ready(function(){
         if (body.year != "")
             movie.year = body.year;
         
-        if (body.rank != "")
-            movie.rank = body.rank;
+        if (body.rating != "")
+            movie.rating = body.rating;
 
         /**
              * Updates movie to the database
@@ -50,6 +50,7 @@ $(document).ready(function(){
                 $('#info').show();
             }
             
+            // TODO
             // search results in in data.result
             // returns as array of RowDataPacket {id: 1, name: '#7 Train: An Immigrant Journey, The', year: 2000, rank: null, nsynced: 0, deleted: 0}
             // but the individual info are still accessible the same way e.g. data.result[0].id => 1

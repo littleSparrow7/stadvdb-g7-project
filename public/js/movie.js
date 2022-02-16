@@ -45,11 +45,11 @@ class Movie {
     get updateString(){
         var arr = [];
 
-        if (this.title != null && this.title != ""){
+        if (this.title !== null && this.title !== ""){
             arr.push("`name`='" + this.title.replaceAll("'", "''") + "'");
         }
         
-        if (this.year != null && this.year != ""){
+        if (this.year !== null && this.year !== ""){
             arr.push("`year`=" + this.year);
         }
         
@@ -72,15 +72,15 @@ class Movie {
     get filterString(){
         var arr = [];
 
-        if (this.id != null && this.id != ""){
+        if (this.id !== null && this.id !== ""){
             arr.push("`id`=" + this.id);
         }
 
-        if (this.title != null && this.title != ""){
+        if (this.title !== null && this.title !== ""){
             arr.push("`name` LIKE '%" + this.title.replaceAll("'", "''") + "%'");
         }
         
-        if (this.year != null && this.year != ""){
+        if (this.year !== null && this.year !== ""){
             arr.push("`year`=" + this.year);
         }
         
