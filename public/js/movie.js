@@ -77,7 +77,7 @@ class Movie {
         }
 
         if (this.title !== null && this.title !== ""){
-            arr.push("`name` LIKE '%" + this.title.replaceAll("'", "''") + "%'");
+            arr.push("`name` LIKE '%" + this.title.replace(/'/g, "''") + "%'");
         }
         
         if (this.year !== null && this.year !== ""){
