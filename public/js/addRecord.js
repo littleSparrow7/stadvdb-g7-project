@@ -33,7 +33,7 @@ $(document).ready(function(){
              * Inserts new movie to the database
              * @param { Movie } movie without id
              */
-            $.post(nodepath + "/addMovie", movie, function(err, { data }){
+            $.post(nodepath + "/addMovie", movie, function(data){
                 if (!data.node1.connected){
                     $("#info").hide();
                     $('#error').text("Failed to connect to database");
