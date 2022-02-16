@@ -12,7 +12,33 @@
         </div>
         
         {{> form}}
-        <script type="module" src="/js/searchRecord.js"></script>
+
+        <br>
+        <div class="table-responsive">
+            <table class="table table-striped"> 
+            <thead>
+                <tr>
+                <th class="numbers" scope="col">Movie ID</th>
+                <th class="words" scope="col">Movie Title</th>
+                <th class="numbers" scope="col">Year</th>
+                <th class="numbers" scope="col">Rank</th>
+                </tr>
+            </thead>
+            <tbody id="searchTable">
+                <!--
+                <tr>
+                {{#each (results)}}
+                <td class="numbers">{{this.id}}</td>
+                <td class="words">random</td>
+                <td class="numbers">data</td>
+                <td class="numbers">placeholder</td>
+                </tr>
+                {{/each}}
+                -->
+            </tbody>
+            </table>
+        </div>
+         <script type="module" src="/js/searchRecord.js"></script>
         </main>
 
     </div>
