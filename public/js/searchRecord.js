@@ -10,6 +10,10 @@ $(document).ready(function(){
     $("#generic-form").submit(function(e) {
         e.preventDefault();
         
+        $('#info').text("Searching movie records...please wait");
+        $('#info').show();
+
+        // empties search result table
         $('#searchTable').empty();
         
         var body = new Movie(
@@ -48,7 +52,7 @@ $(document).ready(function(){
             }
             else{
                 $('#error').hide();
-                $('#info').text("Successfully retrieved the data");
+                $('#info').text("Record(s) successfully found");
                 $('#info').show();
 
                 for (var i = 0; i < data.result.length; i++){

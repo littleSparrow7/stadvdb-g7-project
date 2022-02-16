@@ -8,26 +8,47 @@
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Home</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
-            {{!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                <span data-feather="calendar"></span>
-                Nodes?
-            </button> --}}
             </div>
         </div>
-        
-        <!-- table partial for Node 1 -->
-        {{> table}}
+    
+        <!-- table for 10 most recent movies -->
+        <h3 class="h3">10 Most Recent Movies</h3>
+        <div class="table-responsive">
+            <table class="table table-striped"> 
+            <thead>
+                <tr>
+                <th class="numbers" scope="col">Movie ID</th>
+                <th class="words" scope="col">Movie Title</th>
+                <th class="numbers" scope="col">Year</th>
+                <th class="numbers" scope="col">Rank</th>
+                </tr>
+            </thead>
+            <tbody id="topTenRecentTable">
+                 {{!-- main.js will append data here --}}
+            </tbody>
+            </table>
+        </div>
         <hr>
-        <!-- table partial for Node 2 -->
-        {{> table}}
-        <hr>
-        <!-- table partial for Node 3 -->
-        {{> table}}
+
+         <!-- table for top 10 movies -->
+        <h3 class="h3">Top 10 Movies</h3>
+        <div class="table-responsive">
+            <table class="table table-striped"> 
+            <thead>
+                <tr>
+                <th class="numbers" scope="col">Movie ID</th>
+                <th class="words" scope="col">Movie Title</th>
+                <th class="numbers" scope="col">Year</th>
+                <th class="numbers" scope="col">Rank</th>
+                </tr>
+            </thead>
+            <tbody id="topTenRankTable">
+                {{!-- main.js will append data here --}}
+            </tbody>
+            </table>
+        </div>
 
         <script type="module" src="/js/main.js"></script>
-        {{!-- <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas> --}}
-
-        {{!-- <h2>Section title</h2> --}}
         
         </main>
     </div>

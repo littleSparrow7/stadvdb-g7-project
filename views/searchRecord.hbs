@@ -13,6 +13,8 @@
         
         {{> form}}
 
+        <hr>
+        <h3 class="h3">Search Results</h3>
         <br>
         <div class="table-responsive">
             <table class="table table-striped"> 
@@ -25,16 +27,7 @@
                 </tr>
             </thead>
             <tbody id="searchTable">
-                <!--
-                <tr>
-                {{#each (results)}}
-                <td class="numbers">{{this.id}}</td>
-                <td class="words">random</td>
-                <td class="numbers">data</td>
-                <td class="numbers">placeholder</td>
-                </tr>
-                {{/each}}
-                -->
+                 {{!-- searchRecord.js will append data here --}}
             </tbody>
             </table>
         </div>
