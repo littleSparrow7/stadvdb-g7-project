@@ -1,5 +1,5 @@
 import mysql from 'mysql';
-import { syncMovies, verifyRecordIntegrity } from './node1.js';
+import { syncMovies, verifyRecordIntegrity } from './nodeController.js';
 
 export var node1 = mysql.createPool({
     host            : 'db4free.net',

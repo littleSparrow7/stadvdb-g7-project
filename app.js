@@ -5,7 +5,7 @@ import { test } from './tests/test.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import { CronJob } from 'cron';
-import { syncMovies, verifyRecordIntegrity } from './controllers/node1.js';
+import { syncMovies, verifyRecordIntegrity } from './controllers/nodeController.js';
 import { NODE } from './public/js/user.js';
 
 const app = express();
@@ -60,12 +60,12 @@ app.listen(port, hostname, () => console.log(`Server running at: http://${hostna
 
 // sync movies every 30 minutes
 // TODO: cronJob
-// var job = new CronJob('00 */30  * * * *', function(){
-//     console.log("SYNCING FILES");
-//     verifyRecordIntegrity(NODE, function(status){
-//         syncMovies(function(){
+var job = new CronJob('00 */30  * * * *', function(){
+    console.log("SYNCING FILES");
+    verifyRecordIntegrity(NODE, function(status){
+        syncMovies(function(){
     
-//         });
-//     });
-// });
-// job.start();
+        });
+    });
+});
+job.start();

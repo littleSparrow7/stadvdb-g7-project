@@ -1,8 +1,8 @@
 import express from 'express';
 export var test = express.Router();
-import {checkNodeActive, getConnection, node1, node2, node3, setNodeActive, setNodeInactive} from '../controllers/pools.js';
+import {checkNodeActive, node1, node2, node3, setNodeActive, setNodeInactive} from '../controllers/pools.js';
 import * as sql from '../controllers/nodes.js';
-import * as node1Controller from '../controllers/node1.js';
+import * as nodeController from '../controllers/nodeController.js';
 import Movie from '../public/js/movie.js';
 
 test.get('/test', function(req, res){
@@ -57,7 +57,7 @@ test.get('/add1Node', function (req,res){
         nsynced: 1,
         deleted: 0
     };
-    node1Controller.addMovie(movie, res);
+    nodeController.addMovie(movie, res);
     // sql.insertMovie(node1, movie, function(result){
     //     res.send(result);
     // });
