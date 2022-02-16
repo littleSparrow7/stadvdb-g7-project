@@ -14,7 +14,7 @@ class Movie {
 
         if (this.title != null && this.title != ""){
             cols += ", `name`";
-            values += ", '" + this.title.replaceAll("'", "''") + "'";
+            values += ", '" + this.title.replace(/'/g, "''") + "'";
         }
         
         if (this.year != null && this.year != ""){
@@ -46,7 +46,7 @@ class Movie {
         var arr = [];
 
         if (this.title !== null && this.title !== ""){
-            arr.push("`name`='" + this.title.replaceAll("'", "''") + "'");
+            arr.push("`name`='" + this.title.replace(/'/g, "''") + "'");
         }
         
         if (this.year !== null && this.year !== ""){
