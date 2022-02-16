@@ -58,7 +58,6 @@ app.get('/searchResults', (req, res) => (
 
 app.listen(port, hostname, () => console.log(`Server running at: http://${hostname}:${port}`));
 
-// verifyRecordIntegrity();
 // sync movies every 30 minutes
 // TODO: cronJob
 // var job = new CronJob('00 */30  * * * *', function(){

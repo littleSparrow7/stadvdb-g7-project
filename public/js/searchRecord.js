@@ -39,9 +39,20 @@ $(document).ready(function(){
              * @param { Movie } movie without id
              */
         $.get(nodepath + "/searchMovie", movie, function(data){
-            alert(data.result[0]);
-            alert(data.result[0].name);
-            // returns as array of RowDataPacket {id: 1, name: '#7 Train: An Immigrant Journey, The', year: 2000, rank: null, nsynced: 0, …}
+            if (data.error){
+                $("#info").hide();
+                $("#error").text("Encountered an error when trying to retrieve the data.");
+                $('#error').show();
+            }
+            else{
+                $('#error').hide();
+                $('#info').text("Successfully retrieved the data");
+                $('#info').show();
+            }
+            
+            // search results in in data.result
+            // returns as array of RowDataPacket {id: 1, name: '#7 Train: An Immigrant Journey, The', year: 2000, rank: null, nsynced: 0, deleted: 0}
+            // but the individual info are still accessible the same way e.g. data.result[0].id => 1
         });
     });
 });

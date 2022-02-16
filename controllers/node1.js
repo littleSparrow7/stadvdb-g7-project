@@ -15,6 +15,7 @@ export function updateMovie(req, res){
     console.log("UPDATE MOVIE");
     var movie = new Movie(req.body.id, req.body.title, req.body.year, req.body.rating, req.body.nsynced, req.body.deleted);
     updateOne(movie, function(data){
+        console.log(data);
         res.send(data);
     });
 }
