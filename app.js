@@ -1,3 +1,4 @@
+
 import express from 'express';
 import exphbs from 'express-handlebars';
 import { router } from './routes/routes.js';
@@ -7,10 +8,11 @@ import {fileURLToPath} from 'url';
 import { CronJob } from 'cron';
 import { syncMovies, verifyRecordIntegrity } from './controllers/nodeController.js';
 import { NODE } from './public/js/user.js';
+import 'dotenv/config';
 
 const app = express();
-const port = 8000;
-const hostname = "localhost";
+const port = process.env.PORT;
+const hostname = process.env.HOSTNAME;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
