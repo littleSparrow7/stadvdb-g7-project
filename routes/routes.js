@@ -24,26 +24,26 @@ router.get('/node1/searchMovie', node1Controller.searchMovie);
 
 // *** NODE 2 ***
 // POST request for adding a movie from node2
-router.post('/node2/addMovie', node2Controller.addMovie);
+router.post('/node2/addMovie', node1Controller.addMovie);
 
 // POST request for updating a movie from node2
-router.post('/node2/updateMovie', node2Controller.updateMovie);
+router.post('/node2/updateMovie', node1Controller.updateMovie);
 
 // POST request for deleting a movie from node2
-router.post('/node2/deleteMovie', node2Controller.deleteMovie);
+router.post('/node2/deleteMovie', node1Controller.deleteMovie);
 
 // GET request for searching a movie from node2
-router.get('/node2/searchMovie', node2Controller.searchMovie);
+router.get('/node2/searchMovie', node1Controller.searchMovie);
 
 // *** NODE 3 ***
 // POST request for adding a movie from node3
-router.post('/node3/addMovie', node3Controller.addMovie);
+router.post('/node3/addMovie', node1Controller.addMovie);
 
 // POST request for updating a movie from node3
-router.post('/node3/updateMovie', node3Controller.updateMovie);
+router.post('/node3/updateMovie', node1Controller.updateMovie);
 
 // POST request for deleting a movie from node3
-router.post('/node3/deleteMovie', node3Controller.deleteMovie);
+router.post('/node3/deleteMovie', node1Controller.deleteMovie);
 
 // GET request for searching a movie from node3
 router.get('/node3/searchMovie', node1Controller.searchMovie);
