@@ -10,12 +10,12 @@ $(document).ready(function(){
         console.log(data);
         // alert(data);
 
-        for (var i = 0; i < data.result.length; i++){
+        for (var i = 0; i < data.length; i++){
             $('#topTenRecentTable').append(`<tr>
-                                        <td class="numbers">${data.result[i].id}</td>
-                                        <td class="words">${data.result[i].name}</td>
-                                        <td class="numbers">${data.result[i].year}</td>
-                                        <td class="numbers">${data.result[i].rank}</td>
+                                        <td class="numbers">${data[i].id}</td>
+                                        <td class="words">${data[i].name}</td>
+                                        <td class="numbers">${data[i].year}</td>
+                                        <td class="numbers">${data[i].rank}</td>
                                     </tr>`);
         }
         // search results in in data
@@ -27,12 +27,12 @@ $(document).ready(function(){
         console.log(data);
         // alert(data);
 
-        for (var i = 0; i < data.result.length; i++){
+        for (var i = 0; i < data.length; i++){
             $('#topTenRankTable').append(`<tr>
-                                        <td class="numbers">${data.result[i].id}</td>
-                                        <td class="words">${data.result[i].name}</td>
-                                        <td class="numbers">${data.result[i].year}</td>
-                                        <td class="numbers">${data.result[i].rank}</td>
+                                        <td class="numbers">${data[i].id}</td>
+                                        <td class="words">${data[i].name}</td>
+                                        <td class="numbers">${data[i].year}</td>
+                                        <td class="numbers">${data[i].rank}</td>
                                     </tr>`);
         }
         // search results in in data

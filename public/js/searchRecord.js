@@ -50,6 +50,11 @@ $(document).ready(function(){
                 $("#error").text("Encountered an error when trying to retrieve the data.");
                 $('#error').show();
             }
+            else if(data.result[0] == null){
+                $('#error').hide();
+                $('#info').text("Record does not exist");
+                $('#info').show();
+            }
             else{
                 $('#error').hide();
                 $('#info').text("Record(s) successfully found");

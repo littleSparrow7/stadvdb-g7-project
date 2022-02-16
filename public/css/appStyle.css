@@ -163,3 +163,11 @@ body {
 .words {
     padding-top: 0.25rem;
 }
+
+.table-short{
+  height: 50vh;
+}
+
+.table-show-all{
+  height: auto;
+}

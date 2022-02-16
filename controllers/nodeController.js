@@ -896,7 +896,7 @@ function syncTwoNodes(query, nodeInfo, callback){
 }
 
 export function getRecentTen(req, res){
-    var query = "SELECT * FROM movies ORDER BY `id` DESC LIMIT 10";
+    var query = "SELECT * FROM movies ORDER BY `year` DESC LIMIT 10";
 
     retrieveDataFromNode1(query, function(status, result){
         if (status == 200){
@@ -905,7 +905,7 @@ export function getRecentTen(req, res){
         else{
             retrieveDataFromNode2And3(query, function(status, result){
                 if (status == 200){
-                    var data = result.sort((a, b) => (a.id > b.id)? 1 : ((b.id > a.id)? -1 : 0));
+                    var data = result.sort((a, b) => (a.year > b.year)? 1 : ((b.year > a.year)? -1 : 0));
 
                     res.send(data.slice(0, 10));
                 }
