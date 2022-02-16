@@ -44,19 +44,19 @@ function updateOne(movie, callback){
             if (altNode == 2){
                 altNodeInfo = {
                     nodeid: 2,
-                    link: node2
+                    pool: node2
                 };
             }
             else{
                 altNodeInfo = {
                     nodeid: 3,
-                    link: node3
+                    pool: node3
                 };
             }
 
             var node1Info = {
                 nodeid: 1,
-                link: node1
+                pool: node1
             };
 
             getConnections(node1Info, altNodeInfo, function(conn1, conn2){
@@ -298,7 +298,7 @@ export function searchMovie(req, res){
 
     var node1Info = {
         nodeid: 1,
-        link: node1
+        pool: node1
     };
 
     getConnection(node1Info, function(conn1){ 
@@ -324,12 +324,12 @@ export function searchMovie(req, res){
         else{
             var node2Info = {
                 nodeid: 2,
-                link: node2
+                pool: node2
             };
 
             var node3Info = {
                 nodeid: 3,
-                link: node3
+                pool: node3
             };
             getConnection(node2Info, function(conn2){
                 getConnection(node3Info, function(conn3){
@@ -411,6 +411,7 @@ export function searchMovie(req, res){
                         data.error = true;
                         data.result = [];
                         console.log("FAILED TO CONNECT TO DATABASES");
+                        res.send(data);
                     }
                 });
             });
@@ -445,9 +446,10 @@ export function verifyRecordIntegrity(nodeid, callback){
                 var connInfo = {nodeid: nodeInfo.nodeid, conn: conn};
                 sql.lockTableWrite(connInfo, function(status){
                     if (status == 200){
+                        
                         sql.queryFunction(connInfo, query, function(err, res){
                             sql.commitOrRollBackTransaction(connInfo, function(res){
-                                if (res != 200){
+                                if (res.commit != 200){
                                     console.log("VERIFY FILE INTEGRITY: FAILED TO COMMIT CHANGES");
                                 }
                                 else{
@@ -479,15 +481,16 @@ export function verifyRecordIntegrity(nodeid, callback){
     }
 }
 
-export function syncMovies(){
+export function syncMovies(callback){
     var length = uncommittedMovies.length;
     //add movies that failed to add
     updateMany(uncommittedMovies, length, function(){
-        syncTwoNodes("WHERE year < 1980 AND nsynced > 0", node2, function(res1){
-            syncTwoNodes("WHERE year >= 1980 AND nsynced > 0", node3, function(res2){
+        syncTwoNodes("WHERE year < 1980 AND nsynced > 0", { nodeid: 2, pool: node2 }, function(res1){
+            syncTwoNodes("WHERE year >= 1980 AND nsynced > 0", { nodeid: 3, pool: node3 }, function(res2){
                 console.log("FINISHED SYNCING DATA");
                 console.log(res1);
                 console.log(res2);
+                callback();
             });
         });
     });
@@ -563,7 +566,7 @@ function insertOne(movie, callback){
                                     //if lock 2 also successful, add to 2
                                     movie.id = id;
                                     data.backupNode.locked = true;
-    
+                                    
                                     //insert movie to other node
                                     sql.insertMovie(conn2Info, movie, function(id, insert2Status){
                                         //regardless of whether node2 was successful, node1 must be successful in committing
@@ -756,10 +759,37 @@ async function insertSingleRow(connInfo, movie){
     });
 }
 
+async function updateSingleRow(connInfo, movie){
+    return new Promise((resolve, reject) => {
+        try{
+            var stmt = "UPDATE movies SET " + movie.updateString + " WHERE id=" + movie.id;
+            sql.queryFunction(connInfo, stmt, function(err, res){
+                if (res.affectedRows == 0){
+                    resolve(500);
+                }
+                else{
+                    sql.commitOrRollBackTransaction(connInfo, function(commitStatus){
+                        if (commitStatus.commit != 200){
+                            resolve(500);
+                        }
+                        else{
+                            resolve(200); 
+                        }
+                    });
+                }
+            });
+        }
+        catch (e){
+            console.error(e);
+            resolve(500);
+        }
+    });
+}
+
 function syncTwoNodes(query, nodeInfo, callback){
     var node1Info = {
         nodeid: 1,
-        link: node1
+        pool: node1
     };
 
     getConnection(node1Info, function(conn1){
@@ -770,8 +800,8 @@ function syncTwoNodes(query, nodeInfo, callback){
             };
             sql.lockTableRead(conn1Info, function(status){
                 if (status == 200){
-                    sql.queryFunction(conn1Info, "SELECT * FROM movies " + query, function(err, res){
-                        sql.unlockTable(conn1Info, function(status){
+                    sql.queryFunction(conn1Info, "SELECT * FROM movies WHERE nsynced > 0", function(err, res){
+                        sql.unlockTable(conn1, function(status){
                             if (err){
                                 console.error(err);
                                 callback(500);
@@ -792,7 +822,7 @@ function syncTwoNodes(query, nodeInfo, callback){
                                         };
 
                                         if (conn1 != null && conn2 != null){
-
+                                            //TODO: check if some records exist that must be deleted now
                                             sql.lockTableWrite(conn1Info, function(status1){
                                                 sql.lockTableWrite(conn2Info, function(status2){
                                                     (async ()=>{
@@ -804,7 +834,13 @@ function syncTwoNodes(query, nodeInfo, callback){
                                                                     var movie = new Movie(data.id, data.name, data.year, data.rank, 0, data.deleted);
                                                                     console.log(movie);
 
-                                                                    var result2 = await insertSingleRow(conn2Info, movie);
+                                                                    var result2 = null;
+                                                                    if (conn2Info.nodeid == 2 && movie.year >= 1980 || conn1Info.nodeid == 3 && movie.year < 1980){
+                                                                        await updateSingleRow(conn2Info, movie);
+                                                                    }
+                                                                    else{
+                                                                        result2 = await insertSingleRow(conn2Info, movie);
+                                                                    }
             
                                                                     if (result2 == 200){
                                                                         var result1 = await insertSingleRow(conn1Info, movie);

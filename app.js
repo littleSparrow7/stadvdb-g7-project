@@ -60,10 +60,13 @@ app.listen(port, hostname, () => console.log(`Server running at: http://${hostna
 
 // verifyRecordIntegrity();
 // sync movies every 30 minutes
-var job = new CronJob('00 */30  * * * *', function(){
-    console.log("SYNCING FILES");
-    verifyRecordIntegrity(NODE, function(status){
-        syncMovies();
-    });
-});
-job.start();
+// TODO: cronJob
+// var job = new CronJob('00 */30  * * * *', function(){
+//     console.log("SYNCING FILES");
+//     verifyRecordIntegrity(NODE, function(status){
+//         syncMovies(function(){
+    
+//         });
+//     });
+// });
+// job.start();

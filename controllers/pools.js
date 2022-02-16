@@ -1,4 +1,5 @@
 import mysql from 'mysql';
+import { syncMovies, verifyRecordIntegrity } from './node1.js';
 
 export var node1 = mysql.createPool({
     host            : 'db4free.net',
@@ -68,6 +69,12 @@ export function setNodeActive(nodeid){
         node2IsActive = true;
     else if (nodeid == 3)
         node3IsActive = true;
+
+    syncMovies(function(){
+        verifyRecordIntegrity(nodeid, function(){
+            console.log("DONE RESTORING DATA");
+        });
+    });
 }
 
 export function getConnection(poolInfo, callback){
@@ -80,12 +87,13 @@ export function getConnection(poolInfo, callback){
                 callback(null);
             }
             else{
-                console.log("Connected to the node");
+                console.log("Connected to node " + poolInfo.nodeid);
                 callback(conn);
             }
         });
     }
     else{
+        console.log("Failed to connect to node " + poolInfo.nodeid);
         callback(null);
     }
 }
@@ -93,18 +101,14 @@ export function getConnection(poolInfo, callback){
 export function getConnections(pool1, pool2, callback){
     getConnection(pool1, function(n1_conn){
         if (n1_conn == null){
-            console.error("Failed to connect to first node");
             callback(null, null);
         }
         else{
-            console.log("Connected to first node");
             getConnection(pool2, function(n2_conn){
                 if (n2_conn == null){
-                    callback(n1_conn, null);
-                    console.error("Failed to connect to second node");
+                    callback(n1_conn, null)                    
                 }
                 else{
-                    console.log("Connected to second node");
                     callback(n1_conn, n2_conn);
                 }
             });
