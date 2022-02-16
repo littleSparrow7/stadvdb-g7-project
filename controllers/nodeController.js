@@ -918,7 +918,7 @@ export function getRecentTen(req, res){
 }
 
 export function getTopTen(req, res){
-    var query = "SELECT * FROM movies `deleted`=0 ORDER BY `rank` DESC LIMIT 10";
+    var query = "SELECT * FROM movies WHERE `deleted`=0 ORDER BY `rank` DESC LIMIT 10";
 
     retrieveDataFromNode1(query, function(status, result){
         if (status == 200){
