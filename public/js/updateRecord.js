@@ -9,6 +9,9 @@ $(document).ready(function(){
     $("#generic-form").submit(function(e) {
         e.preventDefault();
 
+        $('#info').text("Updating movie record...please wait");
+        $('#info').show();
+
         var movie = new Movie(
             $("#inputID4").val(),
             $("#inputTitle4").val(),
@@ -58,7 +61,7 @@ $(document).ready(function(){
                 }
                 else{
                     $('#error').hide();
-                    $('#info').text("Successfully inserted");
+                    $('#info').text("Record successfully updated");
                     $('#info').show();
                 }
             });
