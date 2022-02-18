@@ -143,7 +143,7 @@ export function lockTablesWrite(conn1, conn2, callback){
         else{
             callback({conn1: status, conn2: null});
         }
-    }, 0);
+    });
 }
 
 /**
@@ -182,7 +182,7 @@ export function lockTablesRead(conn1, conn2, callback){
         else{
             callback({conn1: status, conn2: null});
         }
-    }, 0);
+    });
 }
 
 
