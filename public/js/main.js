@@ -6,9 +6,13 @@ $(document).ready(function(){
     $('#topTenRankTable').empty();
     $('#topTenRecentTable').empty();
 
+    $('#error').hide();
+    $('#info').text("Fetching data...please wait");
+
     $.get("/recentTen", function(data){
         console.log(data);
         // alert(data);
+        $('#info').hide();
 
         for (var i = 0; i < data.length; i++){
             $('#topTenRecentTable').append(`<tr>
@@ -26,6 +30,7 @@ $(document).ready(function(){
     $.get("/topTen", function(data){
         console.log(data);
         // alert(data);
+        $('#info').hide();
 
         for (var i = 0; i < data.length; i++){
             $('#topTenRankTable').append(`<tr>
