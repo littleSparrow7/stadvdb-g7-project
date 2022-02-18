@@ -905,7 +905,7 @@ export function getRecentTen(req, res){
         else{
             retrieveDataFromNode2And3(query, function(status, result){
                 if (status == 200){
-                    var data = result.sort((a, b) => (a.year > b.year)? 1 : ((b.year > a.year)? -1 : 0));
+                    var data = result.sort((a, b) => (a.year < b.year)? 1 : ((b.year < a.year)? -1 : 0));
 
                     res.send(data.slice(0, 10));
                 }
@@ -927,7 +927,7 @@ export function getTopTen(req, res){
         else{
             retrieveDataFromNode2And3(query, function(status, result){
                 if (status == 200){
-                    var data = result.sort((a, b) => (a.rank > b.rank)? 1 : ((b.rank > a.rank)? -1 : 0));
+                    var data = result.sort((a, b) => (a.rank < b.rank)? 1 : ((b.rank < a.rank)? -1 : 0));
 
                     res.send(data.slice(0, 10));
                 }
