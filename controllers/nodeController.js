@@ -39,7 +39,7 @@ function updateOne(movie, callback){
         }
     };
 
-    sql.findRecord(movie.id, function(altNode){
+    sql.findRecord(movie, function(altNode){
         if (altNode != null){
             var altNodeInfo = null;
             if (altNode == 2){
@@ -235,7 +235,14 @@ function updateOne(movie, callback){
                                     }
                                     else{
                                         uncommittedMovies.push(movie);
-                                        callback(data);
+
+                                        sql.rollbackTransaction(conn1, function(status){
+                                            sql.unlockTable(conn1, function(unlockStatus){
+                                                if (unlockStatus == 200)
+                                                    data.node1.unlocked = true;
+                                                callback(data);
+                                            })
+                                        });
                                     }
                                 });
                             }
