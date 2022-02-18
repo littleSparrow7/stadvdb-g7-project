@@ -280,34 +280,46 @@ export function unlockTables(conn1, conn2, callback){
     });
 }
 
-export function findRecord(id, callback){
-    queryFunction({nodeid: 2, link: node2}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
-        if (res.length > 0){
+export function findRecord(movie, callback){
+    var id = movie.id;
+    if (id != null){
+
+        queryFunction({nodeid: 2, link: node2}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
+            if (res.length > 0){
+                callback(2);
+            }
+            else {
+                queryFunction({nodeid: 3, link: node3}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
+                    if (res.length > 0){
+                        callback(3);
+                    }
+                    else {
+                        queryFunction({nodeid: 1, link: node1}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
+                            if (err){
+                                callback(null);
+                            }
+                            else if (res.length > 0){
+                                if (res[0].year < 1980){
+                                    callback(2);
+                                }
+                                else{
+                                    callback(3);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    else{
+        if (parseInt(movie.year) < 1980){
             callback(2);
         }
-        else {
-            queryFunction({nodeid: 3, link: node3}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
-                if (res.length > 0){
-                    callback(3);
-                }
-                else {
-                    queryFunction({nodeid: 1, link: node1}, "SELECT * FROM movies WHERE id=" + id, function(err,res){
-                        if (err){
-                            callback(null);
-                        }
-                        else if (res.length > 0){
-                            if (res[0].year < 1980){
-                                callback(2);
-                            }
-                            else{
-                                callback(3);
-                            }
-                        }
-                    });
-                }
-            });
+        else{
+            callback(3);
         }
-    });
+    }
 }
 
 
