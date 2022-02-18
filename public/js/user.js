@@ -1,4 +1,4 @@
-export var NODE = 3;
+export var NODE = 2;
 export var nodepath = '/node' + NODE;
 export var uncommittedMovies = [];
 export var isSyncing = false;
