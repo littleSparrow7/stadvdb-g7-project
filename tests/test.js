@@ -143,8 +143,16 @@ test.get('/killProcessLists', function(req, res){
 })
 
 test.get('/testFunction', function(req, res){
-    node1.query("UPDATE movies SET nsynced=1 WHERE id=412359", function(err, res){
-        console.log(res);
+    node1.query("SELECT COUNT(*) AS count FROM movies WHERE deleted = 1", function(err, res){
+        console.log("node1:" + res[0].count);
+    });
+
+    node2.query("SELECT COUNT(*) AS count FROM movies WHERE deleted = 1", function(err, res){
+        console.log("node2:" + res[0].count);
+    });
+
+    node3.query("SELECT COUNT(*) AS count FROM movies WHERE deleted = 1", function(err, res){
+        console.log("node3:" + res[0].count);
     });
 });
 
