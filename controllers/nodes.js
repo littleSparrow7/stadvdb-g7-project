@@ -173,7 +173,7 @@ export function lockTablesWrite(conn1, conn2, callback){
 }
 
 export function lockTablesRead(conn1, conn2, callback){
-    lockTablesRead(conn1, function(status){
+    lockTableRead(conn1, function(status){
         if (status == 200){
             lockTableRead(conn2, function(status2){
                 callback({conn1: status, conn2: status2});
