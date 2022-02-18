@@ -1001,7 +1001,7 @@ function retrieveDataFromNode2And3(query, callback){
                 conn: conn3
             };
         
-            sql.lockTablesRead(conn2, conn3, function(status){
+            sql.lockTablesRead(conn2Info, conn3Info, function(status){
                 if (status.conn1 == 200 && status.conn2 == 200){
                     sql.queryFunction(conn2Info, query, function(err2, res2){
                         sql.queryFunction(conn3Info, query, function(err3, res3){
